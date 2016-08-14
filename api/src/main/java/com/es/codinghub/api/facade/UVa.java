@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.es.codinghub.api.entities.Submission;
-import com.es.codinghub.api.entities.Veredict;
+import com.es.codinghub.api.entities.Verdict;
 
 public class UVa extends OnlineJudge {
 	
@@ -21,46 +21,6 @@ public class UVa extends OnlineJudge {
 		if (problems == null) cacheProblems();
 	}
 	
-	private void cacheProblems() throws IOException {
-		problems = new HashMap<>();
-		
-		String response = request("/p");
-		JSONArray probs = new JSONArray(response);
-		
-		for(int i=0; i<probs.length(); ++i) {
-			JSONArray prob = probs.getJSONArray(i);
-			String title = prob.getInt(1) + " - " + prob.getString(2);
-			problems.put(prob.getInt(0), title);
-		}
-	}
-	
-	private Submission createSubmission(JSONArray sub) {
-		return new Submission(
-			sub.getInt(0),
-			sub.getInt(4),
-			problems.get(sub.getInt(1)),
-			mapVeredict(sub.getInt(2))
-		);
-	}
-	
-	private Veredict mapVeredict(int ver) {
-		switch(ver) {
-			case 10: return Veredict.SUBMISSION_ERROR;
-			case 15: return Veredict.CANT_BE_JUDGED;
-			case 20: return Veredict.IN_QUEUE;
-			case 30: return Veredict.COMPILATION_ERROR;
-			case 35: return Veredict.RESTRICTED_FUNCTION;
-			case 40: return Veredict.RUNTIME_ERROR;
-			case 45: return Veredict.OUTPUT_LIMIT;
-			case 50: return Veredict.TIME_LIMIT;
-			case 60: return Veredict.MEMORY_LIMIT;
-			case 70: return Veredict.WRONG_ANSWER; 
-			case 80: return Veredict.PRESENTATION_ERROR;
-			case 90: return Veredict.ACCEPTED;
-			default: return null;
-		}
-	}
-
 	@Override
 	public JSONArray getSubmissionsAfter(Submission last) throws IOException {
 		String response = (last == null)?
@@ -70,7 +30,7 @@ public class UVa extends OnlineJudge {
 		JSONArray subs = new JSONObject(response).getJSONArray("subs");
 		JSONArray result = new JSONArray();
 		
-		for(int i=0; i<subs.length(); ++i) {
+		for(int i = 0; i < subs.length(); ++i) {
 			JSONArray sub = subs.getJSONArray(i);
 			result.put(createSubmission(sub)); 
 		}
@@ -93,6 +53,41 @@ public class UVa extends OnlineJudge {
 			
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	private void cacheProblems() throws IOException {
+		problems = new HashMap<>();
+		
+		String response = request("/p");
+		JSONArray probs = new JSONArray(response);
+		
+		for(int i = 0; i < probs.length(); ++i) {
+			JSONArray prob = probs.getJSONArray(i);
+			String title = prob.getInt(1) + " - " + prob.getString(2);
+			problems.put(prob.getInt(0), title);
+		}
+	}
+	
+	private Submission createSubmission(JSONArray sub) {
+		return new Submission(
+			sub.getInt(0),
+			sub.getInt(4),
+			problems.get(sub.getInt(1)),
+			mapVerdict(sub.getInt(2))
+		);
+	}
+	
+	private Verdict mapVerdict(int ver) {
+		switch(ver) {
+			case 30: return Verdict.COMPILATION_ERROR;
+			case 40: return Verdict.RUNTIME_ERROR;
+			case 50: return Verdict.TIME_LIMIT;
+			case 60: return Verdict.MEMORY_LIMIT;
+			case 70: return Verdict.WRONG_ANSWER; 
+			case 80: return Verdict.PRESENTATION_ERROR;
+			case 90: return Verdict.ACCEPTED;
+			default: return Verdict.OTHER;
 		}
 	}
 }

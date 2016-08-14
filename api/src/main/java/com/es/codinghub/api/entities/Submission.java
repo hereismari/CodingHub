@@ -8,13 +8,13 @@ public class Submission implements JSONString {
 	private int id;
 	private int timestamp;
 	private String problem;
-	private Veredict veredict;
+	private Verdict verdict;
 	
-	public Submission(int id, int timestamp, String problem, Veredict veredict) {
+	public Submission(int id, int timestamp, String problem, Verdict verdict) {
 		this.id = id;
 		this.timestamp = timestamp;
 		this.problem = problem;
-		this.veredict = veredict;
+		this.verdict = verdict;
 	}
 	
 	public int getId() {
@@ -29,8 +29,8 @@ public class Submission implements JSONString {
 		return problem;
 	}
 	
-	public Veredict getVeredict() {
-		return veredict;
+	public Verdict getVerdict() {
+		return verdict;
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class Submission implements JSONString {
 				.key("id").value(id)
 				.key("timestamp").value(timestamp)
 				.key("problem").value(problem)
-				.key("veredict").value(veredict)
+				.key("veredict").value(verdict)
 			.endObject();
 		
 		return stringer.toString();
