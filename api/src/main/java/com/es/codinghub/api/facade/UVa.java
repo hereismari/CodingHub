@@ -63,9 +63,11 @@ public class UVa extends OnlineJudge {
 
 	@Override
 	public JSONArray getSubmissionsAfter(Submission last) throws IOException {
-		String response = request("/subs-user/" + userID);
-		JSONArray subs = new JSONObject(response).getJSONArray("subs");
+		String response = (last == null)?
+			request("/subs-user/" + userID):
+			request("/subs-user/" + userID + "/" + last.getId());
 		
+		JSONArray subs = new JSONObject(response).getJSONArray("subs");
 		JSONArray result = new JSONArray();
 		
 		for(int i=0; i<subs.length(); ++i) {
