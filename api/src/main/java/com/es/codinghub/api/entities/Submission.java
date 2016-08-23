@@ -41,7 +41,7 @@ public class Submission implements JSONString {
 				.key("id").value(id)
 				.key("timestamp").value(timestamp)
 				.key("problem").value(problem.toJSONString())
-				.key("veredict").value(verdict)
+				.key("verdict").value(verdict)
 			.endObject();
 		
 		return stringer.toString();
