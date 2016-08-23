@@ -20,24 +20,24 @@ public class Codeforces extends OnlineJudge {
 		this.userHandle = username;
 		if (problems == null) cacheProblems();
 	}
-	
+
 	@Override
 	public JSONArray getSubmissionsAfter(Submission last) throws IOException {
 		String response = request("user.status?handle=" + userHandle);
 		JSONArray subs = new JSONObject(response).getJSONArray("result");
-		
+
 		JSONArray result = new JSONArray();
-		
+
 		for(int i = 0; i < subs.length(); ++i) {
 			JSONObject sub = subs.getJSONObject(i);
-			result.put(createSubmission(sub)); 
+			result.put(createSubmission(sub));
 		}
-		
+
 		return result;
 	}
 
 	@Override
-	public JSONObject getSudgestedProblems() {
+	public JSONArray getSudgestedProblems() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -48,7 +48,7 @@ public class Codeforces extends OnlineJudge {
 			System.out.println("Requesting submissions...");
 			JSONArray result = cf.getSubmissionsAfter(null);
 			System.out.println(result);
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -56,25 +56,25 @@ public class Codeforces extends OnlineJudge {
 
 	private void cacheProblems() throws IOException {
 		problems = new HashMap<>();
-		
+
 		String response = request("/problemset.problems");
 		JSONArray probs = new JSONObject(response).getJSONObject("result").getJSONArray("problems");
-		
+
 		for(int i = 0; i < probs.length(); ++i) {
 			JSONObject prob = probs.getJSONObject(i);
-			problems.put(((Integer)prob.get("contestId")).toString() + (String)prob.get("index"), (String) prob.get("name"));
+			problems.put(prob.getInt("contestId") + prob.getString("index"), prob.getString("name"));
 		}
 	}
-	
+
 	private Submission createSubmission(JSONObject sub) {
 		return new Submission(
-				(int) sub.get("id"),
-				(int) sub.get("creationTimeSeconds"),
-				(String) ((JSONObject)sub.get("problem")).get("name"),
-				mapVerdict((String) sub.get("verdict"))
+			sub.getInt("id"),
+			sub.getInt("creationTimeSeconds"),
+			sub.getJSONObject("problem").getString("name"),
+			mapVerdict(sub.getString("verdict"))
 		);
 	}
-	
+
 	private Verdict mapVerdict(String ver) {
 		switch(ver) {
 			case "OK": return Verdict.ACCEPTED;
