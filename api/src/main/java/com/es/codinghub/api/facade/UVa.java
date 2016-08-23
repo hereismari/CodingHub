@@ -7,13 +7,14 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.es.codinghub.api.entities.Problem;
 import com.es.codinghub.api.entities.Submission;
 import com.es.codinghub.api.entities.Verdict;
 
 public class UVa extends OnlineJudge {
 	
 	private String userID;
-	private static Map<Integer, String> problems;
+	private static Map<String, Problem> problems;
 
 	public UVa(String username) throws IOException {
 		super("http://uhunt.felix-halim.net/api");
@@ -32,7 +33,8 @@ public class UVa extends OnlineJudge {
 		
 		for(int i = 0; i < subs.length(); ++i) {
 			JSONArray sub = subs.getJSONArray(i);
-			result.put(createSubmission(sub)); 
+			Problem problem = problems.get(sub.getInt(1) + "");
+			result.put(createSubmission(sub, problem)); 
 		}
 		
 		return result;
@@ -63,17 +65,25 @@ public class UVa extends OnlineJudge {
 		JSONArray probs = new JSONArray(response);
 		
 		for(int i = 0; i < probs.length(); ++i) {
+			
 			JSONArray prob = probs.getJSONArray(i);
+			
 			String title = prob.getInt(1) + " - " + prob.getString(2);
-			problems.put(prob.getInt(0), title);
+			String id = prob.getInt(0) + "";
+			int solvedCount = prob.getInt(18);
+			problems.put(id, createProblem(id, title, solvedCount));
 		}
 	}
 	
-	private Submission createSubmission(JSONArray sub) {
+	private Problem createProblem(String id, String title, int solvedCount) {
+		return new Problem(id, title, solvedCount);
+	}
+
+	private Submission createSubmission(JSONArray sub, Problem problem) {
 		return new Submission(
 			sub.getInt(0),
 			sub.getInt(4),
-			problems.get(sub.getInt(1)),
+			problem,
 			mapVerdict(sub.getInt(2))
 		);
 	}

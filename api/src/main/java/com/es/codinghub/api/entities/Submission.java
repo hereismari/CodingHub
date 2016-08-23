@@ -5,12 +5,13 @@ import org.json.JSONStringer;
 import org.json.JSONWriter;
 
 public class Submission implements JSONString {
+	
 	private int id;
 	private int timestamp;
-	private String problem;
+	private Problem problem;
 	private Verdict verdict;
 	
-	public Submission(int id, int timestamp, String problem, Verdict verdict) {
+	public Submission(int id, int timestamp, Problem problem, Verdict verdict) {
 		this.id = id;
 		this.timestamp = timestamp;
 		this.problem = problem;
@@ -25,7 +26,7 @@ public class Submission implements JSONString {
 		return timestamp;
 	}
 	
-	public String getProblem() {
+	public Problem getProblem() {
 		return problem;
 	}
 	
@@ -39,7 +40,7 @@ public class Submission implements JSONString {
 			.object()
 				.key("id").value(id)
 				.key("timestamp").value(timestamp)
-				.key("problem").value(problem)
+				.key("problem").value(problem.toJSONString())
 				.key("veredict").value(verdict)
 			.endObject();
 		

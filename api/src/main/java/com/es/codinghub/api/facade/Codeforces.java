@@ -7,13 +7,14 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.es.codinghub.api.entities.Problem;
 import com.es.codinghub.api.entities.Submission;
 import com.es.codinghub.api.entities.Verdict;
 
 public class Codeforces extends OnlineJudge {
 
 	private String userHandle;
-	private static Map<String, String> problems;
+	private static Map<String, Problem> problems;
 
 	public Codeforces(String username) throws IOException {
 		super("http://codeforces.com/api/");
@@ -23,6 +24,7 @@ public class Codeforces extends OnlineJudge {
 	
 	@Override
 	public JSONArray getSubmissionsAfter(Submission last) throws IOException {
+		
 		String response = request("user.status?handle=" + userHandle);
 		JSONArray subs = new JSONObject(response).getJSONArray("result");
 		
@@ -30,9 +32,15 @@ public class Codeforces extends OnlineJudge {
 		
 		for(int i = 0; i < subs.length(); ++i) {
 			JSONObject sub = subs.getJSONObject(i);
-			result.put(createSubmission(sub)); 
-		}
+			JSONObject prob = sub.getJSONObject("problem");
+			String id = ((Integer)prob.get("contestId")).toString() + (String)prob.get("index");
+			System.out.println(id);
+			Problem problem = problems.get(id);
+			if(problem != null) {
+				result.put(createSubmission(sub, problem)); 
 		
+			}
+		}
 		return result;
 	}
 
@@ -55,22 +63,34 @@ public class Codeforces extends OnlineJudge {
 	}
 
 	private void cacheProblems() throws IOException {
+		
 		problems = new HashMap<>();
 		
 		String response = request("/problemset.problems");
 		JSONArray probs = new JSONObject(response).getJSONObject("result").getJSONArray("problems");
+		JSONArray probstats = new JSONObject(response).getJSONObject("result").getJSONArray("problemStatistics");
 		
 		for(int i = 0; i < probs.length(); ++i) {
+			
 			JSONObject prob = probs.getJSONObject(i);
-			problems.put(((Integer)prob.get("contestId")).toString() + (String)prob.get("index"), (String) prob.get("name"));
+			
+			String name = (String)prob.get("name");
+			String id = ((Integer)prob.get("contestId")).toString() + (String)prob.get("index");
+			
+			JSONObject stats = probstats.getJSONObject(i);
+			problems.put(id, createProblem(id, name, stats));
 		}
 	}
 	
-	private Submission createSubmission(JSONObject sub) {
+	private Problem createProblem(String id, String name, JSONObject stats) {	
+		return new Problem(id, name, (Integer)stats.get("solvedCount"));
+	}
+	
+	private Submission createSubmission(JSONObject sub, Problem problem) {
 		return new Submission(
 				(int) sub.get("id"),
 				(int) sub.get("creationTimeSeconds"),
-				(String) ((JSONObject)sub.get("problem")).get("name"),
+				problem,
 				mapVerdict((String) sub.get("verdict"))
 		);
 	}
