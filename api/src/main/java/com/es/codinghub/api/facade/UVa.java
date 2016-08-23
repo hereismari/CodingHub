@@ -7,6 +7,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.es.codinghub.api.entities.Problem;
 import com.es.codinghub.api.entities.Submission;
 import com.es.codinghub.api.entities.Verdict;
 
@@ -14,8 +15,8 @@ public class UVa extends OnlineJudge {
 
 	private String userID;
 
-	private static Map<Integer, String> problemsByID;
-	private static Map<Integer, String> problemsByNumber;
+	private static Map<Integer, Problem> problemsByID;
+	private static Map<Integer, Problem> problemsByNumber;
 
 	private static JSONArray cpBook;
 
@@ -73,15 +74,23 @@ public class UVa extends OnlineJudge {
 		JSONArray probs = new JSONArray(response);
 
 		for (int i = 0; i < probs.length(); ++i) {
-			JSONArray prob = probs.getJSONArray(i);
-			String title = prob.getInt(1) + " - " + prob.getString(2);
+			JSONArray p = probs.getJSONArray(i);
+			Problem problem = createProblem(p);
 
-			problemsByID.put(prob.getInt(0), title);
-			problemsByNumber.put(prob.getInt(1), title);
+			problemsByID.put(p.getInt(0), problem);
+			problemsByNumber.put(p.getInt(1), problem);
 		}
 
 		response = request("/cpbook/3");
 		cpBook = parseBook(new JSONArray(response));
+	}
+
+	private Problem createProblem(JSONArray prob) {
+		return new Problem(
+			Integer.toString(prob.getInt(1)),
+			prob.getString(2),
+			prob.getInt(18)
+		);
 	}
 
 	private Submission createSubmission(JSONArray sub) {

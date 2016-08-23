@@ -7,17 +7,19 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.es.codinghub.api.entities.Problem;
 import com.es.codinghub.api.entities.Submission;
 import com.es.codinghub.api.entities.Verdict;
 
 public class Codeforces extends OnlineJudge {
 
 	private String userHandle;
-	private static Map<String, String> problems;
+	private static Map<String, Problem> problems;
 
 	public Codeforces(String username) throws IOException {
 		super("http://codeforces.com/api/");
 		this.userHandle = username;
+
 		if (problems == null) cacheProblems();
 	}
 
@@ -28,9 +30,10 @@ public class Codeforces extends OnlineJudge {
 
 		JSONArray result = new JSONArray();
 
-		for(int i = 0; i < subs.length(); ++i) {
+		for (int i = 0; i < subs.length(); ++i) {
 			JSONObject sub = subs.getJSONObject(i);
-			result.put(createSubmission(sub));
+			Submission submission = createSubmission(sub);
+			if (submission.getProblem() != null) result.put(submission);
 		}
 
 		return result;
@@ -58,25 +61,46 @@ public class Codeforces extends OnlineJudge {
 		problems = new HashMap<>();
 
 		String response = request("/problemset.problems");
-		JSONArray probs = new JSONObject(response).getJSONObject("result").getJSONArray("problems");
+		JSONObject body = new JSONObject(response).getJSONObject("result");
 
-		for(int i = 0; i < probs.length(); ++i) {
-			JSONObject prob = probs.getJSONObject(i);
-			problems.put(prob.getInt("contestId") + prob.getString("index"), prob.getString("name"));
+		JSONArray probs = body.getJSONArray("problems");
+		JSONArray probstats = body.getJSONArray("problemStatistics");
+
+		for (int i = 0; i < probs.length(); ++i) {
+			JSONObject p = probs.getJSONObject(i);
+			JSONObject s = probstats.getJSONObject(i);
+
+			Problem problem = createProblem(p, s);
+			problems.put(problem.getId(), problem);
 		}
 	}
 
+	private String buildProblemId(JSONObject prob) {
+		return prob.getInt("contestId") + prob.getString("index");
+	}
+
+	private Problem createProblem(JSONObject prob, JSONObject stats) {
+		return new Problem(
+			buildProblemId(prob),
+			prob.getString("name"),
+			stats.getInt("solvedCount")
+		);
+	}
+
 	private Submission createSubmission(JSONObject sub) {
+		JSONObject prob = sub.getJSONObject("problem");
+		String id = buildProblemId(prob);
+
 		return new Submission(
 			sub.getInt("id"),
 			sub.getInt("creationTimeSeconds"),
-			sub.getJSONObject("problem").getString("name"),
+			problems.get(id),
 			mapVerdict(sub.getString("verdict"))
 		);
 	}
 
 	private Verdict mapVerdict(String ver) {
-		switch(ver) {
+		switch (ver) {
 			case "OK": return Verdict.ACCEPTED;
 			case "TIME_LIMIT_EXCEEDED": return Verdict.TIME_LIMIT;
 			case "MEMORY_LIMIT_EXCEEDED": return Verdict.MEMORY_LIMIT;
