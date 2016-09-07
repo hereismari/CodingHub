@@ -28,6 +28,18 @@ public class Problem implements JSONString {
 		return solvedCount;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Problem == false)
+			return false;
+		Problem other = (Problem) obj;
+		return id.equals(other.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
 
 	@Override
 	public String toJSONString() {

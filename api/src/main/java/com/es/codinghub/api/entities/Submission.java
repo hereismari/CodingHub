@@ -8,6 +8,7 @@ public class Submission implements JSONString {
 
 	private int id;
 	private int timestamp;
+
 	private Problem problem;
 	private Verdict verdict;
 
@@ -32,6 +33,19 @@ public class Submission implements JSONString {
 
 	public Verdict getVerdict() {
 		return verdict;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Problem == false)
+			return false;
+		Submission other = (Submission) obj;
+		return id == other.id;
+	}
+
+	@Override
+	public int hashCode() {
+		return id;
 	}
 
 	@Override

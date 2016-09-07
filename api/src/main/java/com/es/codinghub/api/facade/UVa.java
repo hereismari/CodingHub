@@ -18,14 +18,13 @@ public class UVa extends OnlineJudge {
 	private static Map<Integer, Problem> problemsByID;
 	private static Map<Integer, Problem> problemsByNumber;
 
-	private static JSONArray cpBook;
+	private static JSONArray sugested;
 
 	public UVa(String username) throws IOException {
 		super("http://uhunt.felix-halim.net/api");
 		this.userID = request("/uname2uid/" + username);
 
-		if (problemsByID == null || problemsByNumber == null)
-			cacheProblems();
+		if (sugested == null) cache();
 	}
 
 	@Override
@@ -46,27 +45,11 @@ public class UVa extends OnlineJudge {
 	}
 
 	@Override
-	public JSONArray getSudgestedProblems() {
-		return cpBook;
+	public JSONArray getSugestedProblems() {
+		return sugested;
 	}
 
-	public static void main(String[] args) {
-		try {
-			UVa uva = new UVa("VictorAA");
-			System.out.println("Requesting submissions...");
-
-			JSONArray result = uva.getSubmissionsAfter(null);
-			System.out.println(result);
-
-			result = uva.getSudgestedProblems();
-			System.out.println(result);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void cacheProblems() throws IOException {
+	private void cache() throws IOException {
 		problemsByID = new HashMap<>();
 		problemsByNumber = new HashMap<>();
 
@@ -74,15 +57,54 @@ public class UVa extends OnlineJudge {
 		JSONArray probs = new JSONArray(response);
 
 		for (int i = 0; i < probs.length(); ++i) {
-			JSONArray p = probs.getJSONArray(i);
-			Problem problem = createProblem(p);
+			JSONArray prob = probs.getJSONArray(i);
+			Problem problem = createProblem(prob);
 
-			problemsByID.put(p.getInt(0), problem);
-			problemsByNumber.put(p.getInt(1), problem);
+			problemsByID.put(prob.getInt(0), problem);
+			problemsByNumber.put(prob.getInt(1), problem);
 		}
 
 		response = request("/cpbook/3");
-		cpBook = parseBook(new JSONArray(response));
+		sugested = parseBook(new JSONArray(response));
+	}
+
+	private JSONArray parseBook(JSONArray book) {
+
+		JSONArray result = new JSONArray();
+		for (Object e : book) {
+
+			String tag = null;
+			JSONArray elems = null;
+
+			if (e instanceof JSONObject) {
+				JSONObject obj = (JSONObject) e;
+
+				tag = obj.getString("title");
+				elems = parseBook(obj.getJSONArray("arr"));
+			}
+
+			if (e instanceof JSONArray) {
+				JSONArray arr = (JSONArray) e;
+				JSONArray probs = new JSONArray();
+
+				for (int i=1; i<arr.length(); ++i) {
+					int number = Math.abs(arr.getInt(i));
+					probs.put(problemsByNumber.get(number));
+				}
+
+				tag = arr.getString(0);
+				elems = probs;
+			}
+
+			JSONObject chapter = new JSONObject();
+
+			chapter.put("tag", tag);
+			chapter.put("elements", elems);
+
+			result.put(chapter);
+		}
+
+		return result;
 	}
 
 	private Problem createProblem(JSONArray prob) {
@@ -113,43 +135,5 @@ public class UVa extends OnlineJudge {
 			case 90: return Verdict.ACCEPTED;
 			default: return Verdict.OTHER;
 		}
-	}
-
-	private JSONArray parseBook(JSONArray book) {
-		JSONArray result = new JSONArray();
-
-		for (Object e : book) {
-			String tag = null;
-			JSONArray elems = null;
-
-			if (e instanceof JSONObject) {
-				JSONObject obj = (JSONObject) e;
-
-				tag = obj.getString("title");
-				elems = parseBook(obj.getJSONArray("arr"));
-			}
-
-			if (e instanceof JSONArray) {
-				JSONArray arr = (JSONArray) e;
-				JSONArray probs = new JSONArray();
-
-				for (int i=1; i<arr.length(); ++i) {
-					int number = Math.abs(arr.getInt(i));
-					probs.put(problemsByNumber.get(number));
-				}
-
-				tag = arr.getString(0);
-				elems = probs;
-			}
-
-			JSONObject sub = new JSONObject();
-
-			sub.put("tag", tag);
-			sub.put("elements", elems);
-
-			result.put(sub);
-		}
-
-		return result;
 	}
 }

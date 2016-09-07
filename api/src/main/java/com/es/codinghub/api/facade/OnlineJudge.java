@@ -29,6 +29,5 @@ public abstract class OnlineJudge {
 	}
 
 	public abstract JSONArray getSubmissionsAfter(Submission last) throws IOException;
-
-	public abstract JSONArray getSudgestedProblems() throws IOException;
+	public abstract JSONArray getSugestedProblems() throws IOException;
 }
