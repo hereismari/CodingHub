@@ -37,7 +37,7 @@ public class Submission implements JSONString {
 
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof Problem == false)
+		if(obj instanceof Submission == false)
 			return false;
 		Submission other = (Submission) obj;
 		return id == other.id;
