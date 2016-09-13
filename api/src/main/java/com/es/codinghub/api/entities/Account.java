@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import org.json.JSONString;
 import org.json.JSONStringer;
@@ -17,7 +18,10 @@ public class Account implements JSONString {
 	@GeneratedValue
 	private long id;
 
+	@NotNull
 	private String judge;
+
+	@NotNull
 	private String username;
 
 	public Account() {}
@@ -25,6 +29,10 @@ public class Account implements JSONString {
 	public Account(String judge, String username) {
 		this.judge = judge;
 		this.username = username;
+	}
+
+	public long getId() {
+		return id;
 	}
 
 	@Override

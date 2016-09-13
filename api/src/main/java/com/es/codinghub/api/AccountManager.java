@@ -5,25 +5,23 @@ import javax.persistence.RollbackException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.es.codinghub.api.entities.User;
 
-@Path("/user")
-public class UserManager {
+@Path("/user/{userid}/account")
+public class AccountManager {
 
 	@POST
 	@Consumes("application/x-www-form-urlencoded")
-	public Response createUser(
-			@FormParam("email") String email,
-			@FormParam("password") String password) {
+	public Response addAccount(
+			@PathParam("userid") long userid,
+			@FormParam("judge") String judge,
+			@FormParam("username") String username) {
 
 		EntityManager manager = Database.createEntityManager();
 
@@ -32,9 +30,9 @@ public class UserManager {
 
 		try {
 			manager.getTransaction().begin();
-			User user = new User(email, password);
+			User user = manager.find(User.class, userid);
 
-			manager.persist(user);
+			user.addAccount(judge, username);
 			manager.getTransaction().commit();
 
 			code = Status.CREATED;
@@ -52,9 +50,10 @@ public class UserManager {
 	}
 
 	@DELETE
-	@Path("/{userid}")
-	public Response deleteUser(
-			@PathParam("userid") long userid) {
+	@Path("/{accountid}")
+	public Response removeAccount(
+			@PathParam("userid") long userid,
+			@PathParam("accountid") long accountid) {
 
 		EntityManager manager = Database.createEntityManager();
 
@@ -69,44 +68,7 @@ public class UserManager {
 				code = Status.NOT_FOUND;
 
 			else {
-				manager.remove(user);
-				code = Status.OK;
-			}
-
-			manager.getTransaction().commit();
-		}
-
-		catch (RollbackException e) {
-			code = Status.INTERNAL_SERVER_ERROR;
-		}
-
-		finally {
-			manager.close();
-		}
-
-		return Response.status(code).entity(body).build();
-	}
-
-	@GET
-	@Path("/{userid}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUser(
-			@PathParam("userid") long userid) {
-
-		EntityManager manager = Database.createEntityManager();
-
-		String body = null;
-		Status code = null;
-
-		try {
-			manager.getTransaction().begin();
-			User user = manager.find(User.class, userid);
-
-			if (user == null)
-				code = Status.NOT_FOUND;
-
-			else {
-				body = user.toJSONString();
+				user.removeAccount(accountid);
 				code = Status.OK;
 			}
 

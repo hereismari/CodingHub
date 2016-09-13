@@ -2,6 +2,7 @@ package com.es.codinghub.api.entities;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -11,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -26,14 +28,16 @@ public class User implements JSONString {
 	@GeneratedValue
 	private long id;
 
+	@NotNull
 	@Column(unique=true)
 	@Pattern(regexp=".+@.+\\..+")
 	private String email;
 
+	@NotNull
 	@Size(min=6)
 	private String password;
 
-	@OneToMany(cascade=CascadeType.ALL)
+	@OneToMany(orphanRemoval=true, cascade=CascadeType.ALL)
 	@JoinColumn(name="userid")
 	private List<Account> accounts = new ArrayList<>();
 
@@ -47,6 +51,15 @@ public class User implements JSONString {
 	public void addAccount(String judge, String username) {
 		Account account = new Account(judge, username);
 		accounts.add(account);
+	}
+
+	public void removeAccount(long accountid) {
+		accounts.removeIf(new Predicate<Account>() {
+			@Override
+			public boolean test(Account account) {
+				return account.getId() == accountid;
+			}
+		});
 	}
 
 	@Override
