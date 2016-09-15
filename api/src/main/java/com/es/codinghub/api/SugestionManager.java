@@ -4,11 +4,13 @@ import java.io.IOException;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.es.codinghub.api.facade.OnlineJudge;
 
@@ -16,16 +18,28 @@ import com.es.codinghub.api.facade.OnlineJudge;
 public class SugestionManager {
 
 	@GET
-	@Path("/{judge}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getSugestedProblems(
-			@PathParam("judge") OnlineJudge judge) {
+	public Response getSugestedProblems() {
 
 		String body = null;
 		Status code = null;
 
 		try {
-			body = judge.getApi().getSugestedProblems().toString();
+			JSONArray response = new JSONArray();
+
+			for (OnlineJudge judge : OnlineJudge.values()) {
+				JSONObject chapter = new JSONObject();
+
+				String tag = judge.toString();
+				JSONArray elements = judge.getApi().getSugestedProblems();
+
+				chapter.put("tag", tag);
+				chapter.put("elements", elements);
+
+				response.put(chapter);
+			}
+
+			body = response.toString();
 			code = Status.OK;
 		}
 

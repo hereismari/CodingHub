@@ -44,11 +44,11 @@ public class SubmissionManager {
 
 			List<Submission> response = new ArrayList<>();
 
-			for(Account account : accounts) {
+			for (Account account : accounts) {
 				OnlineJudgeApi api = account.getJudge().getApi();
 				List<Submission> submissions = api.getSubmissionsAfter(account.getUsername(), null);
 
-				for(Submission submission : submissions)
+				for (Submission submission : submissions)
 					response.add(submission);
 			}
 
