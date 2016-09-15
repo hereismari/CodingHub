@@ -1,6 +1,8 @@
 package com.es.codinghub.api.entities;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -9,6 +11,8 @@ import javax.validation.constraints.NotNull;
 import org.json.JSONString;
 import org.json.JSONStringer;
 import org.json.JSONWriter;
+
+import com.es.codinghub.api.facade.OnlineJudge;
 
 @Entity
 @Table(name="accounts")
@@ -19,20 +23,29 @@ public class Account implements JSONString {
 	private long id;
 
 	@NotNull
-	private String judge;
+	@Enumerated(EnumType.STRING)
+	private OnlineJudge judge;
 
 	@NotNull
 	private String username;
 
 	public Account() {}
 
-	public Account(String judge, String username) {
+	public Account(OnlineJudge judge, String username) {
 		this.judge = judge;
 		this.username = username;
 	}
 
 	public long getId() {
 		return id;
+	}
+
+	public OnlineJudge getJudge() {
+		return judge;
+	}
+
+	public String getUsername() {
+		return username;
 	}
 
 	@Override

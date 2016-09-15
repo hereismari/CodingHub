@@ -4,15 +4,20 @@ import org.json.JSONString;
 import org.json.JSONStringer;
 import org.json.JSONWriter;
 
+import com.es.codinghub.api.facade.OnlineJudge;
+
 public class Problem implements JSONString {
 
 	private String id;
 	private String name;
-	private int solvedCount;
 
-	public Problem(String id, String name, int solvedCount) {
+	private OnlineJudge judge;
+	private Integer solvedCount;
+
+	public Problem(String id, String name, OnlineJudge judge, Integer solvedCount) {
 		this.id = id;
 		this.name = name;
+		this.judge = judge;
 		this.solvedCount = solvedCount;
 	}
 
@@ -24,7 +29,11 @@ public class Problem implements JSONString {
 		return name;
 	}
 
-	public int getSolvedCount() {
+	public OnlineJudge getJudge() {
+		return judge;
+	}
+
+	public Integer getSolvedCount() {
 		return solvedCount;
 	}
 
@@ -47,6 +56,7 @@ public class Problem implements JSONString {
 			.object()
 				.key("id").value(id)
 				.key("name").value(name)
+				.key("judge").value(judge)
 				.key("solvedCount").value(solvedCount)
 			.endObject();
 

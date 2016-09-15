@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.es.codinghub.api.entities.User;
+import com.es.codinghub.api.facade.OnlineJudge;
 
 @Path("/user/{userid}/account")
 public class AccountManager {
@@ -20,7 +21,7 @@ public class AccountManager {
 	@Consumes("application/x-www-form-urlencoded")
 	public Response addAccount(
 			@PathParam("userid") long userid,
-			@FormParam("judge") String judge,
+			@FormParam("judge") OnlineJudge judge,
 			@FormParam("username") String username) {
 
 		EntityManager manager = Database.createEntityManager();

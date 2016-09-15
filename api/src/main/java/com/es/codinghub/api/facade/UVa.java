@@ -1,7 +1,9 @@
 package com.es.codinghub.api.facade;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -10,35 +12,37 @@ import org.json.JSONObject;
 import com.es.codinghub.api.entities.Problem;
 import com.es.codinghub.api.entities.Submission;
 import com.es.codinghub.api.entities.Verdict;
+import com.es.codinghub.api.network.Resource;
 
-public class UVa extends OnlineJudge {
+public class UVa implements OnlineJudgeApi {
 
-	private String userID;
+	private static final Resource api = new Resource("http://uhunt.felix-halim.net/api");
+	private static final Object lock = new Object();
 
 	private static Map<Integer, Problem> problemsByID;
 	private static Map<Integer, Problem> problemsByNumber;
-
 	private static JSONArray sugested;
 
-	public UVa(String username) throws IOException {
-		super("http://uhunt.felix-halim.net/api");
-		this.userID = request("/uname2uid/" + username);
-
-		if (sugested == null) cache();
+	public UVa() throws IOException {
+		synchronized (lock) {
+			if (sugested == null) cacheProblems();
+		}
 	}
 
 	@Override
-	public JSONArray getSubmissionsAfter(Submission last) throws IOException {
+	public List<Submission> getSubmissionsAfter(String username, Submission last) throws IOException {
+		String userid = api.request("/uname2uid/" + username);
+
 		String response = (last == null)?
-			request("/subs-user/" + userID):
-			request("/subs-user/" + userID + "/" + last.getId());
+			api.request("/subs-user/" + userid):
+			api.request("/subs-user/" + userid + "/" + last.getId());
 
 		JSONArray subs = new JSONObject(response).getJSONArray("subs");
-		JSONArray result = new JSONArray();
+		List<Submission> result = new ArrayList<>();
 
 		for (int i = 0; i < subs.length(); ++i) {
 			JSONArray sub = subs.getJSONArray(i);
-			result.put(createSubmission(sub));
+			result.add(createSubmission(sub));
 		}
 
 		return result;
@@ -49,11 +53,11 @@ public class UVa extends OnlineJudge {
 		return sugested;
 	}
 
-	private void cache() throws IOException {
+	private void cacheProblems() throws IOException {
 		problemsByID = new HashMap<>();
 		problemsByNumber = new HashMap<>();
 
-		String response = request("/p");
+		String response = api.request("/p");
 		JSONArray probs = new JSONArray(response);
 
 		for (int i = 0; i < probs.length(); ++i) {
@@ -64,11 +68,11 @@ public class UVa extends OnlineJudge {
 			problemsByNumber.put(prob.getInt(1), problem);
 		}
 
-		response = request("/cpbook/3");
+		response = api.request("/cpbook/3");
 		sugested = parseBook(new JSONArray(response));
 	}
 
-	private JSONArray parseBook(JSONArray book) {
+	private static JSONArray parseBook(JSONArray book) {
 
 		JSONArray result = new JSONArray();
 		for (Object e : book) {
@@ -111,6 +115,7 @@ public class UVa extends OnlineJudge {
 		return new Problem(
 			Integer.toString(prob.getInt(1)),
 			prob.getString(2),
+			OnlineJudge.UVa,
 			prob.getInt(18)
 		);
 	}

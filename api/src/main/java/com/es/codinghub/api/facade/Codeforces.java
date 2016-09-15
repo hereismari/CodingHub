@@ -15,32 +15,31 @@ import org.json.JSONObject;
 import com.es.codinghub.api.entities.Problem;
 import com.es.codinghub.api.entities.Submission;
 import com.es.codinghub.api.entities.Verdict;
+import com.es.codinghub.api.network.Resource;
 
-public class Codeforces extends OnlineJudge {
-
-	private String userHandle;
-
-	private static Map<String, Problem> problems;
-
-	private static JSONObject tags;
-	private static JSONArray sugested;
+public class Codeforces implements OnlineJudgeApi {
 
 	private static final int SUGESTED_MAX = 5;
 
-	public Codeforces(String username) throws IOException {
-		super("http://codeforces.com/api/");
-		this.userHandle = username;
+	private static final Resource api = new Resource("http://codeforces.com/api/");
+	private static final Object lock = new Object();
 
-		if (sugested == null) cache();
+	private static Map<String, Problem> problems;
+	private static JSONArray sugested;
+
+	public Codeforces() throws IOException {
+		synchronized (lock) {
+			if (sugested == null) cacheProblems();
+		}
 	}
 
 	@Override
-	public JSONArray getSubmissionsAfter(Submission last) throws IOException {
-		String response = request("user.status?handle=" + userHandle);
+	public List<Submission> getSubmissionsAfter(String username, Submission last) throws IOException {
+		String response = api.request("user.status?handle=" + username);
 		Integer minTimestamp = last == null? -1 : last.getTimestamp();
 
 		JSONArray subs = new JSONObject(response).getJSONArray("result");
-		JSONArray result = new JSONArray();
+		List<Submission> result = new ArrayList<>();
 
 		for (int i = 0; i < subs.length(); ++i) {
 			JSONObject sub = subs.getJSONObject(i);
@@ -48,7 +47,7 @@ public class Codeforces extends OnlineJudge {
 
 			if (submission.getTimestamp() > minTimestamp
 					&& submission.getProblem() != null)
-				result.put(submission);
+				result.add(submission);
 		}
 
 		return result;
@@ -59,11 +58,11 @@ public class Codeforces extends OnlineJudge {
 		return sugested;
 	}
 
-	private void cache() throws IOException {
+	private void cacheProblems() throws IOException {
 		problems = new HashMap<>();
-		tags = new JSONObject();
+		JSONObject tags = new JSONObject();
 
-		String response = request("/problemset.problems");
+		String response = api.request("/problemset.problems");
 		JSONObject json = new JSONObject(response).getJSONObject("result");
 
 		JSONArray probs = json.getJSONArray("problems");
@@ -84,10 +83,10 @@ public class Codeforces extends OnlineJudge {
 			}
 		}
 
-		parseTags();
+		parseTags(tags);
 	}
 
-	private void parseTags() {
+	private void parseTags(JSONObject tags) {
 		sugested = new JSONArray();
 		Iterator<String> it = tags.keys();
 
@@ -137,6 +136,7 @@ public class Codeforces extends OnlineJudge {
 		return new Problem(
 			buildProblemId(prob),
 			prob.getString("name"),
+			OnlineJudge.Codeforces,
 			stats.getInt("solvedCount")
 		);
 	}

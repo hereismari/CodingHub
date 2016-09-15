@@ -45,7 +45,7 @@ public class Submission implements JSONString {
 
 	@Override
 	public int hashCode() {
-		return id;
+		return Integer.hashCode(id);
 	}
 
 	@Override

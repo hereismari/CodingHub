@@ -20,6 +20,8 @@ import org.json.JSONString;
 import org.json.JSONStringer;
 import org.json.JSONWriter;
 
+import com.es.codinghub.api.facade.OnlineJudge;
+
 @Entity
 @Table(name="users")
 public class User implements JSONString {
@@ -48,7 +50,7 @@ public class User implements JSONString {
 		this.password = password;
 	}
 
-	public void addAccount(String judge, String username) {
+	public void addAccount(OnlineJudge judge, String username) {
 		Account account = new Account(judge, username);
 		accounts.add(account);
 	}
@@ -60,6 +62,10 @@ public class User implements JSONString {
 				return account.getId() == accountid;
 			}
 		});
+	}
+
+	public List<Account> getAccounts() {
+		return accounts;
 	}
 
 	@Override
