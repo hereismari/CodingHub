@@ -1,4 +1,4 @@
-package com.es.codinghub.api;
+package com.es.codinghub.api.resources;
 
 import javax.persistence.EntityManager;
 import javax.persistence.RollbackException;
@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.es.codinghub.api.Database;
 import com.es.codinghub.api.entities.User;
 
 @Path("/user")

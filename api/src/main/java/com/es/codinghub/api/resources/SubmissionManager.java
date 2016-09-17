@@ -1,4 +1,4 @@
-package com.es.codinghub.api;
+package com.es.codinghub.api.resources;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.json.JSONArray;
 
+import com.es.codinghub.api.Database;
 import com.es.codinghub.api.entities.Account;
 import com.es.codinghub.api.entities.Submission;
 import com.es.codinghub.api.entities.User;

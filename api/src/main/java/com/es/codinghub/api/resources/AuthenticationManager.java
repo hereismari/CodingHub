@@ -1,4 +1,4 @@
-package com.es.codinghub.api;
+package com.es.codinghub.api.resources;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -9,6 +9,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.json.JSONObject;
+
+import com.es.codinghub.api.Database;
 
 @Path("/login")
 public class AuthenticationManager {

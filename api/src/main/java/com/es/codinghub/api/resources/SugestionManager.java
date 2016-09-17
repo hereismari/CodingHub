@@ -1,4 +1,4 @@
-package com.es.codinghub.api;
+package com.es.codinghub.api.resources;
 
 import java.io.IOException;
 
