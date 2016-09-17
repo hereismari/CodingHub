@@ -55,7 +55,7 @@ public class User implements JSONString {
 		accounts.add(account);
 	}
 
-	public void removeAccount(long accountid) {
+	public void removeAccount(final long accountid) {
 		accounts.removeIf(new Predicate<Account>() {
 			@Override
 			public boolean test(Account account) {
