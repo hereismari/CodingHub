@@ -1,0 +1,6 @@
+rootProject.name = 'coding-hub'
+include ':api'
+include ':app'
+
+project(':api').projectDir = "$rootDir/api" as File
+project(':app').projectDir = "$rootDir/app" as File

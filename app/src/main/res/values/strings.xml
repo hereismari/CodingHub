@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+    <string name="app_name">Coding Hub</string>
+    <string name="email">E-mail</string>
+    <string name="password">Senha</string>
+    <string name="authenticating">Autenticando&#8230;</string>
+    <string name="invalid_email">e-mail inválido</string>
+    <string name="short_password">mínimo de 4 caractéres</string>
+    <string name="signup">Não tem conta? Registre-se</string>
+    <string name="confirm_signup">Registrar</string>
+    <string name="confirm_login">Entrar</string>
+    <string name="password_again">Digite sua senha novamente</string>
+    <string name="passwords_differ">as senhas não conferem</string>
+    <string name="signing_up">Registrando</string>
+</resources>
