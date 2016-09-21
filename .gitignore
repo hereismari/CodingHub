@@ -2,12 +2,17 @@
 .project
 .metadata
 .settings
+.gradle
+.idea
 
 bin/
 gen/
+build/
 target/
 
 *.apk
 *.ap_
 *.dex
 *.class
+*.iml
+*.properties
