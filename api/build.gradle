@@ -1,0 +1,14 @@
+group = 'com.es.codinghub.api'
+description = 'api'
+
+apply plugin: 'java'
+
+dependencies {
+    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-grizzly2-http', version: '2.23.2'
+    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.2.Final'
+    compile group: 'org.hibernate', name: 'hibernate-validator', version: '5.2.4.Final'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.32'
+    compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.21'
+    compile group: 'org.json', name: 'json', version: '20160810'
+    testCompile 'junit:junit:4.12'
+}

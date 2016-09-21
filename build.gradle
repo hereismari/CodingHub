@@ -1,0 +1,22 @@
+
+allprojects  {
+    apply plugin: 'maven'
+
+    group = 'com.es.codinghub'
+    version = '0.0.1-SNAPSHOT'
+
+    repositories {
+        jcenter()
+    }
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+    }
+}
