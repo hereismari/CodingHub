@@ -2,12 +2,8 @@ package com.es.codinghub.app;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,12 +14,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,20 +32,24 @@ public class SignupActivity extends Activity {
     @BindView(R.id.signupButton) Button confirmButton;
 
     private ProgressDialog progressDialog;
+    private RequestQueue queue;
+    private String baseUrl;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.signup);
+        setContentView(R.layout.signup_activity);
         ButterKnife.bind(this);
 
         progressDialog = new ProgressDialog(SignupActivity.this);
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
-        progressDialog.setMessage(getString(R.string.signing_up));
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+        queue = Volley.newRequestQueue(this);
+        baseUrl = getString(R.string.api_url);
     }
 
     @Override
@@ -63,13 +59,14 @@ public class SignupActivity extends Activity {
     }
 
     @OnClick(R.id.signupButton) void signup() {
+
         if(validate() == false)
             return;
 
+        progressDialog.setMessage(getString(R.string.signing_up));
         progressDialog.show();
 
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url = "http://10.0.2.2:8080/user";
+        String url = baseUrl + "/user";
 
         queue.add(new StringRequest(Request.Method.POST, url,
 
@@ -98,12 +95,6 @@ public class SignupActivity extends Activity {
                 params.put("password", password);
 
                 return params;
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                return headers;
             }
         });
     }

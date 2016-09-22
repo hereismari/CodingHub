@@ -18,7 +18,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
@@ -39,20 +38,24 @@ public class LoginActivity extends Activity {
     @BindView(R.id.signupTextView) TextView signupButton;
 
     private ProgressDialog progressDialog;
+    private RequestQueue queue;
+    private String baseUrl;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.login);
+        setContentView(R.layout.login_activity);
         ButterKnife.bind(this);
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
-        progressDialog.setMessage(getString(R.string.authenticating));
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+        queue = Volley.newRequestQueue(this);
+        baseUrl = getString(R.string.api_url);
     }
 
     @Override
@@ -68,13 +71,11 @@ public class LoginActivity extends Activity {
     }
 
     @OnClick(R.id.loginButton) void login() {
-    	if(validate() == false)
-			return;
 
+        progressDialog.setMessage(getString(R.string.authenticating));
         progressDialog.show();
 
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url = "http://10.0.2.2:8080/login";
+        String url = baseUrl + "/login";
 
         queue.add(new JsonObjectRequest(Request.Method.GET, url,
 
@@ -82,7 +83,7 @@ public class LoginActivity extends Activity {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        Long userid = response.getLong("userid");
+                        long userid = response.getLong("userid");
                         onSuccess(userid);
                     }
 
@@ -122,10 +123,8 @@ public class LoginActivity extends Activity {
         editor.putLong("userid", userid);
         editor.commit();
 
-        /* TODO ir para a tela principal
-        Intent intent = new Intent(this, HubActivity.class);
-        startActivity(intent); */
-
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
         finish();
     }
 
@@ -136,26 +135,4 @@ public class LoginActivity extends Activity {
         passwordInput.setText(null);
         progressDialog.hide();
     }
-
-    public boolean validate() {
-        boolean valid = false;
-
-        String email = emailInput.getText().toString();
-        String password = passwordInput.getText().toString();
-
-        if(android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() == false)
-        	emailInput.setError(getString(R.string.invalid_email));
-
-        else if(password.length() < 6)
-        	passwordInput.setError(getString(R.string.short_password));
-
-        else {
-        	emailInput.setError(null);
-        	passwordInput.setError(null);
-        	valid = true;
-        }
-
-        return valid;
-    }
-
 }

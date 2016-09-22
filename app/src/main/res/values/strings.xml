@@ -5,13 +5,21 @@
     <string name="password">Senha</string>
     <string name="authenticating">Autenticando&#8230;</string>
     <string name="authentication_failed">Autenticação falhou</string>
-    <string name="invalid_email">e-mail inválido</string>
-    <string name="short_password">mínimo de 6 caractéres</string>
+    <string name="invalid_email">E-mail inválido</string>
+    <string name="short_password">Senha muito curta</string>
     <string name="signup">Não tem conta? Registre-se</string>
     <string name="confirm_signup">Registrar</string>
     <string name="confirm_login">Entrar</string>
     <string name="password_again">Digite sua senha novamente</string>
-    <string name="passwords_differ">as senhas não conferem</string>
-    <string name="signing_up">Registrando</string>
+    <string name="passwords_differ">As senhas não conferem</string>
+    <string name="signing_up">Registrando&#8230;</string>
     <string name="signup_failed">Não foi possível concluir o cadastro</string>
+    <string name="add_online_judge">Adicionar Conta</string>
+    <string name="username">Usuário</string>
+    <string name="registering_account">Cadastrando Conta&#8230;</string>
+    <string name="operation_failed">Operação falhou</string>
+    <string name="delete_account">Deletar Conta</string>
+    <string name="deleting_account">Deletando Conta</string>
+    <string name="fetching_data">Atualizando</string>
+    <string name="no_connection">Sem conexão</string>
 </resources>
