@@ -16,6 +16,8 @@ public class Problem implements JSONString {
 	private OnlineJudge judge;
 	private Integer solvedCount;
 
+	public Problem() {}
+
 	public Problem(String id, String name, OnlineJudge judge, Integer solvedCount) {
 
 		if(id == null || name == null || judge == null || solvedCount < 0)

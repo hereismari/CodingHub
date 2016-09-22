@@ -14,6 +14,8 @@ public class Submission implements JSONString {
 	private Problem problem;
 	private Verdict verdict;
 
+	public Submission() {}
+
 	public Submission(int id, int timestamp, Problem problem, Verdict verdict) {
 
 		if(id < 0 || timestamp < 0 || problem == null || verdict == null)

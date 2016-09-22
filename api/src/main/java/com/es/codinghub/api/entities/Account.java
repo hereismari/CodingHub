@@ -31,6 +31,8 @@ public class Account implements JSONString {
 	@NotNull
 	private String username;
 
+	public Account() {}
+
 	public Account(OnlineJudge judge, String username) {
 
 		if(judge == null || username == null || username.equals("")) {
