@@ -1,5 +1,6 @@
 package com.es.codinghub.api.entities;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -46,6 +47,10 @@ public class User implements JSONString {
 	public User() {}
 
 	public User(String email, String password) {
+
+		if(email == null || password == null)
+			throw new InvalidParameterException();
+
 		this.email = email;
 		this.password = password;
 	}
@@ -70,6 +75,19 @@ public class User implements JSONString {
 
 	public List<Account> getAccounts() {
 		return accounts;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof User == false)
+			return false;
+		User other = (User) obj;
+		return email.equals(other.email);
+	}
+
+	@Override
+	public int hashCode() {
+		return Long.hashCode(id);
 	}
 
 	@Override

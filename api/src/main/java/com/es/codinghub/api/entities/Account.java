@@ -14,6 +14,8 @@ import org.json.JSONWriter;
 
 import com.es.codinghub.api.facade.OnlineJudge;
 
+import java.security.InvalidParameterException;
+
 @Entity
 @Table(name="accounts")
 public class Account implements JSONString {
@@ -29,9 +31,12 @@ public class Account implements JSONString {
 	@NotNull
 	private String username;
 
-	public Account() {}
-
 	public Account(OnlineJudge judge, String username) {
+
+		if(judge == null || username == null || username.equals("")) {
+			throw new InvalidParameterException();
+		}
+
 		this.judge = judge;
 		this.username = username;
 	}
@@ -47,6 +52,15 @@ public class Account implements JSONString {
 	public String getUsername() {
 		return username;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Account == false)
+			return false;
+		Account other = (Account) obj;
+		return judge == other.getJudge() && username == other.getUsername();
+	}
+
 
 	@Override
 	public String toJSONString() {

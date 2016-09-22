@@ -4,6 +4,8 @@ import org.json.JSONString;
 import org.json.JSONStringer;
 import org.json.JSONWriter;
 
+import java.security.InvalidParameterException;
+
 public class Submission implements JSONString {
 
 	private int id;
@@ -13,6 +15,10 @@ public class Submission implements JSONString {
 	private Verdict verdict;
 
 	public Submission(int id, int timestamp, Problem problem, Verdict verdict) {
+
+		if(id < 0 || timestamp < 0 || problem == null || verdict == null)
+			throw new InvalidParameterException();
+
 		this.id = id;
 		this.timestamp = timestamp;
 		this.problem = problem;

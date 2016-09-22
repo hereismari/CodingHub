@@ -20,8 +20,8 @@ import org.json.JSONArray;
 
 import com.es.codinghub.api.Database;
 import com.es.codinghub.api.entities.Account;
-import com.es.codinghub.api.entities.Submission;
 import com.es.codinghub.api.entities.User;
+import com.es.codinghub.api.entities.Submission;
 import com.es.codinghub.api.facade.OnlineJudgeApi;
 
 @Path("/user/{userid}/submissions")

@@ -1,4 +1,6 @@
-package com.es.codinghub.api;
+package com.es.codinghub.api.network;
+
+import com.es.codinghub.api.Main;
 
 import static org.junit.Assert.assertEquals;
 

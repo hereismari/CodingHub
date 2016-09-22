@@ -6,6 +6,8 @@ import org.json.JSONWriter;
 
 import com.es.codinghub.api.facade.OnlineJudge;
 
+import java.security.InvalidParameterException;
+
 public class Problem implements JSONString {
 
 	private String id;
@@ -15,6 +17,12 @@ public class Problem implements JSONString {
 	private Integer solvedCount;
 
 	public Problem(String id, String name, OnlineJudge judge, Integer solvedCount) {
+
+		if(id == null || name == null || judge == null || solvedCount < 0)
+			throw new InvalidParameterException();
+		if(id.equals("") || name.equals(""))
+			throw new InvalidParameterException();
+
 		this.id = id;
 		this.name = name;
 		this.judge = judge;
