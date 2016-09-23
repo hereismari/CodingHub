@@ -1,7 +1,10 @@
 package com.es.codinghub.api.entities;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import javax.persistence.CascadeType;
@@ -52,7 +55,8 @@ public class User implements JSONString {
 
 	public void addAccount(OnlineJudge judge, String username) {
 		Account account = new Account(judge, username);
-		accounts.add(account);
+		if (accounts.contains(account) == false) accounts.add(account);
+		else throw new IllegalArgumentException();
 	}
 
 	public void removeAccount(final long accountid) {

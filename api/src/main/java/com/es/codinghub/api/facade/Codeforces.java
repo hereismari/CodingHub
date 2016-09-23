@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.es.codinghub.api.entities.Problem;
@@ -38,19 +39,23 @@ public class Codeforces implements OnlineJudgeApi {
 		String response = api.request("user.status?handle=" + username);
 		Integer minTimestamp = last == null? -1 : last.getTimestamp();
 
-		JSONArray subs = new JSONObject(response).getJSONArray("result");
-		List<Submission> result = new ArrayList<>();
+		try {
+			JSONArray subs = new JSONObject(response).getJSONArray("result");
+			List<Submission> result = new ArrayList<>();
 
-		for (int i = 0; i < subs.length(); ++i) {
-			JSONObject sub = subs.getJSONObject(i);
-			Submission submission = createSubmission(sub);
+			for (int i = 0; i < subs.length(); ++i) {
+				JSONObject sub = subs.getJSONObject(i);
+				Submission submission = createSubmission(sub);
 
-			if (submission.getTimestamp() > minTimestamp
-					&& submission.getProblem() != null)
-				result.add(submission);
+				if (submission.getTimestamp() > minTimestamp
+						&& submission.getProblem() != null)
+					result.add(submission);
+			} return result;
 		}
 
-		return result;
+		catch (JSONException e) {
+			return Collections.emptyList();
+		}
 	}
 
 	@Override
