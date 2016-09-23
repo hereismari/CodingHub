@@ -9,6 +9,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.es.codinghub.api.entities.Contest;
 import com.es.codinghub.api.entities.Problem;
 import com.es.codinghub.api.entities.Submission;
 import com.es.codinghub.api.entities.Verdict;
@@ -51,6 +52,25 @@ public class UVa implements OnlineJudgeApi {
 	@Override
 	public JSONArray getSugestedProblems() {
 		return sugested;
+	}
+
+	@Override
+	public List<Contest> getUpcomingContests() throws IOException {
+		String response = api.request("/contests");
+		long timestamp = System.currentTimeMillis() / 1000L;
+
+		JSONArray contests = new JSONArray(response);
+		List<Contest> result = new ArrayList<>();
+
+		for (int i = 0; i < contests.length(); ++i) {
+			JSONObject c = contests.getJSONObject(i);
+			Contest contest = createContest(c);
+
+			if (contest.getTimestamp() > timestamp)
+				result.add(contest);
+		}
+
+		return result;
 	}
 
 	private void cacheProblems() throws IOException {
@@ -126,6 +146,15 @@ public class UVa implements OnlineJudgeApi {
 			sub.getInt(4),
 			problemsByID.get(sub.getInt(1)),
 			mapVerdict(sub.getInt(2))
+		);
+	}
+
+	private Contest createContest(JSONObject c) {
+		return new Contest(
+			OnlineJudge.UVa,
+			c.getString("name"),
+			c.getLong("starttime"),
+			c.getLong("endtime")-c.getLong("starttime")
 		);
 	}
 
