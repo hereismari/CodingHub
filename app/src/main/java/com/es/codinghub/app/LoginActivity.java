@@ -37,6 +37,11 @@ public class LoginActivity extends Activity {
     }
 
     @OnClick(R.id.loginButton) void login() {
+
+        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+        startActivity(intent);
+
+        /*
     	if(validate() == false)
 			return;
 
@@ -44,7 +49,7 @@ public class LoginActivity extends Activity {
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
         progressDialog.setMessage(getString(R.string.authenticating));
-        progressDialog.show();
+        progressDialog.show();*/
     }
 
     public void onLoginFailed() {
