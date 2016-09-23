@@ -40,8 +40,10 @@
         android:layout_marginBottom="16dp"
         android:id="@+id/registerButton" />
 
-    <View style="@style/Divider"
-        android:id="@+id/divider" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="?android:attr/listDivider" />
 
     <ListView
         android:layout_width="match_parent"
