@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.es.codinghub.api.entities.Contest;
 import com.es.codinghub.api.entities.Problem;
 import com.es.codinghub.api.entities.Submission;
 import com.es.codinghub.api.entities.Verdict;
@@ -22,7 +23,7 @@ public class Codeforces implements OnlineJudgeApi {
 
 	private static final int SUGESTED_MAX = 5;
 
-	private static final Resource api = new Resource("http://codeforces.com/api/");
+	private static final Resource api = new Resource("http://codeforces.com/api");
 	private static final Object lock = new Object();
 
 	private static Map<String, Problem> problems;
@@ -36,8 +37,8 @@ public class Codeforces implements OnlineJudgeApi {
 
 	@Override
 	public List<Submission> getSubmissionsAfter(String username, Submission last) throws IOException {
-		String response = api.request("user.status?handle=" + username);
-		Integer minTimestamp = last == null? -1 : last.getTimestamp();
+		String response = api.request("/user.status?handle=" + username);
+		int minTimestamp = last == null? -1 : last.getTimestamp();
 
 		try {
 			JSONArray subs = new JSONObject(response).getJSONArray("result");
@@ -61,6 +62,25 @@ public class Codeforces implements OnlineJudgeApi {
 	@Override
 	public JSONArray getSugestedProblems() {
 		return sugested;
+	}
+
+	@Override
+	public List<Contest> getUpcomingContests() throws IOException {
+		String response = api.request("/contest.list");
+		long timestamp = System.currentTimeMillis() / 1000L;
+
+		JSONArray contests = new JSONObject(response).getJSONArray("result");
+		List<Contest> result = new ArrayList<>();
+
+		for (int i = 0; i < contests.length(); ++i) {
+			JSONObject c = contests.getJSONObject(i);
+			Contest contest = createContest(c);
+
+			if (contest.getTimestamp() > timestamp)
+				result.add(contest);
+		}
+
+		return result;
 	}
 
 	private void cacheProblems() throws IOException {
@@ -155,6 +175,15 @@ public class Codeforces implements OnlineJudgeApi {
 			sub.getInt("creationTimeSeconds"),
 			problems.get(id),
 			mapVerdict(sub.getString("verdict"))
+		);
+	}
+
+	private Contest createContest(JSONObject c) {
+		return new Contest(
+			OnlineJudge.Codeforces,
+			c.getString("name"),
+			c.getLong("startTimeSeconds"),
+			c.getLong("durationSeconds")
 		);
 	}
 

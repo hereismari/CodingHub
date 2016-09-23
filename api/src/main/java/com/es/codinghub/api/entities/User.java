@@ -77,6 +77,19 @@ public class User implements JSONString {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof User == false)
+			return false;
+		User other = (User) obj;
+		return	email.equals(other.email);
+	}
+
+	@Override
+	public int hashCode() {
+		return email.hashCode();
+	}
+
+	@Override
 	public String toJSONString() {
 		JSONWriter stringer = new JSONStringer()
 			.object()
