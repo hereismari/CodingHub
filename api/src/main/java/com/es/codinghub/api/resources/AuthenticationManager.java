@@ -87,19 +87,16 @@ public class AuthenticationManager {
 					.getSingleResult();
 
 			String password = generatePassword();
-			Mailing.send(email, "Recupera\u00e7\u00e3o de conta",
-					"Sua nova senha \u00e9: " + password);
 			user.setPassword(password);
+
+			Mailing.sendParallel(email, "Recupera\u00e7\u00e3o de conta",
+					"Sua nova senha \u00e9: " + password).start();
 
 			code = Status.OK;
 		}
 
 		catch (NoResultException e) {
 			code = Status.BAD_REQUEST;
-		}
-
-		catch (MessagingException e) {
-			code = Status.SERVICE_UNAVAILABLE;
 		}
 
 		finally {

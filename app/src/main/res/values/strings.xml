@@ -22,4 +22,9 @@
     <string name="deleting_account">Deletando Conta</string>
     <string name="fetching_data">Atualizando</string>
     <string name="no_connection">Sem conexão</string>
+    <string name="forgot_password">Esqueci minha senha</string>
+    <string name="confirm_recovery">Recuperar Senha</string>
+    <string name="recovering">Recuperando Senha&#8230;</string>
+    <string name="recovery_failed">Recuperação falhou</string>
+    <string name="recovery_succeded">Um e-mail foi enviado para você</string>
 </resources>

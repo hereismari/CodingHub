@@ -43,4 +43,22 @@ public class Mailing {
 
 		Transport.send(message);
 	}
+
+	public static Thread sendParallel(String to, String subject, String content) {
+
+		return new Thread() {
+			@Override
+			public void run() {
+				int retries = 5;
+				while (retries>0) try {
+					send(to, subject, content);
+					break;
+				}
+
+				catch (MessagingException e) {
+					retries -= 1;
+				}
+			}
+		};
+	}
 }

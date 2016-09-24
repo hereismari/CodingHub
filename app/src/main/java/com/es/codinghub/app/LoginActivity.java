@@ -70,6 +70,12 @@ public class LoginActivity extends Activity {
         finish();
     }
 
+    @OnClick(R.id.recoveryTextView) void recovery() {
+        Intent intent = new Intent(this, RecoveryActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     @OnClick(R.id.loginButton) void login() {
 
         progressDialog.setMessage(getString(R.string.authenticating));
