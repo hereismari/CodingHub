@@ -41,7 +41,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class SettingsActivity extends Activity {
+public class AccountsActivity extends Activity {
 
     @BindView(R.id.onlineJudgeSpinner) Spinner onlineJudge;
     @BindView(R.id.userEditText) EditText onlineJudgeUser;
@@ -61,7 +61,7 @@ public class SettingsActivity extends Activity {
 
         baseUrl = getString(R.string.api_url);
 
-        setContentView(R.layout.settings_activity);
+        setContentView(R.layout.accounts_activity);
         ButterKnife.bind(this);
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -159,7 +159,7 @@ public class SettingsActivity extends Activity {
                         for (int i=0; i<array.length(); ++i)
                             values.add(array.getJSONObject(i));
 
-                        adapter = new AccountsAdapter(SettingsActivity.this, values);
+                        adapter = new AccountsAdapter(AccountsActivity.this, values);
                         accounts.setAdapter(adapter);
                         progressDialog.hide();
                     }
