@@ -22,4 +22,10 @@
     <string name="deleting_account">Deletando Conta</string>
     <string name="fetching_data">Atualizando</string>
     <string name="no_connection">Sem conexão</string>
+    <string name="edit_accounts">Editar Online Judges</string>
+    <string name="change_password">Trocar Senha</string>
+    <string name="old_password">Senha antiga</string>
+    <string name="new_password">Nova senha</string>
+    <string name="changing_password">Trocando Senha&#8230;</string>
+    <string name="wrong_password">Senha incorreta</string>
 </resources>

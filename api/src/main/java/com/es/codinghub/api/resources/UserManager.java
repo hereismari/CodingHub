@@ -127,43 +127,6 @@ public class UserManager {
 	}
 
 	@PUT
-	@Path("/{userid}/email")
-	@Consumes(MediaType.TEXT_PLAIN)
-	public Response updateEmail(String email,
-			@PathParam("userid") long userid) {
-
-		EntityManager manager = Database.createEntityManager();
-
-		String body = null;
-		Status code = null;
-
-		try {
-			manager.getTransaction().begin();
-			User user = manager.find(User.class, userid);
-
-			if (user == null)
-				code = Status.NOT_FOUND;
-
-			else {
-				user.setEmail(email);
-				code = Status.OK;
-			}
-
-			manager.getTransaction().commit();
-		}
-
-		catch (RollbackException e) {
-			code = Status.BAD_REQUEST;
-		}
-
-		finally {
-			manager.close();
-		}
-
-		return Response.status(code).entity(body).build();
-	}
-
-	@PUT
 	@Path("/{userid}/password")
 	@Consumes(MediaType.TEXT_PLAIN)
 	public Response updatePassword(String password,

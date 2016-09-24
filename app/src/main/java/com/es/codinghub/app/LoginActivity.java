@@ -123,7 +123,7 @@ public class LoginActivity extends Activity {
         editor.putLong("userid", userid);
         editor.commit();
 
-        Intent intent = new Intent(this, SettingsActivity.class);
+        Intent intent = new Intent(this, SettingsMenuActivity.class);
         startActivity(intent);
         finish();
     }

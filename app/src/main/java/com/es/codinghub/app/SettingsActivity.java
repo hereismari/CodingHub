@@ -87,7 +87,7 @@ public class SettingsActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(this, LoginActivity.class);
+        Intent intent = new Intent(this, SettingsMenuActivity.class);
         startActivity(intent);
         finish();
     }
