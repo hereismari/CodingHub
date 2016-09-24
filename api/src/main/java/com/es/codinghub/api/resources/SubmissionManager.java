@@ -40,9 +40,9 @@ public class SubmissionManager {
 		try {
 			manager.getTransaction().begin();
 			User user = manager.find(User.class, userid);
-			List<Account> accounts = user.getAccounts();
 			manager.getTransaction().commit();
 
+			List<Account> accounts = user.getAccounts();
 			List<Submission> response = new ArrayList<>();
 
 			for (Account account : accounts) {
