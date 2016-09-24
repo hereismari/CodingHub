@@ -10,8 +10,10 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.EntryXIndexComparator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import butterknife.OnClick;
 
@@ -35,23 +37,14 @@ public class HomeActivity extends Activity {
         for (int i = 0; i < 12; i++)
             entries.add(new Entry(quantity_questions[i], i));
 
+        Collections.sort(entries, new EntryXIndexComparator());
+
         LineDataSet dataSet = new LineDataSet(entries, "Número de questões");
+        dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 
         String c = "#ed1f24";
 
-        dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-        dataSet.setDrawCubic(false);
-        dataSet.setDrawCircles(false);
-        dataSet.setCircleColor(Color.parseColor(c));
-        dataSet.setCircleSize(8f);
-        dataSet.setCircleColorHole(Color.BLACK);
-        dataSet.setDrawCircleHole(false);
-        dataSet.setLineWidth(1f);
-        dataSet.setColor(Color.parseColor(c));
-        dataSet.setDrawHorizontalHighlightIndicator(false);
-        dataSet.setDrawVerticalHighlightIndicator(false);
-
-        String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+        String[] months = {"J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"};
         ArrayList<String> xValues = new ArrayList<>();
         for (int i = 0; i < 12; i++)
             xValues.add(months[i]);
@@ -62,7 +55,13 @@ public class HomeActivity extends Activity {
         lineChart.setData(data);
         lineChart.setDescription("Quantidade de questões feitas por mês.");
         lineChart.animateY(1000);
-        //lineChart.setBackgroundColor(Color.BLUE);
+        lineChart.setTouchEnabled(true);
+        lineChart.setDragEnabled(false);
+        lineChart.setDoubleTapToZoomEnabled(false);
+        lineChart.getXAxis().setDrawGridLines(false);
+
+        LineGraphToolTip toolTip = new LineGraphToolTip(this, R.layout.line_graph_tooltip);
+        lineChart.setMarkerView(toolTip);
     }
 
     private void multiLineChart() {
@@ -110,7 +109,7 @@ public class HomeActivity extends Activity {
     }
 
     @OnClick(R.id.refreshButton) void refresh() {
-        Log.d("CodingHub","aqqq");
+        //Log.d("CodingHub","aqqq");
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
     }
