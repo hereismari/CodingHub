@@ -36,6 +36,8 @@ public class Graphics extends Fragment {
     }
 
     private void simpleLineChart() {
+
+        // AQUI
         int[] quantity_questions = {1,2,3,4,5,6,7,8,9,10,11,12};
         ArrayList<Entry> entries = new ArrayList<>();
         for (int i = 0; i < 12; i++)
@@ -56,6 +58,8 @@ public class Graphics extends Fragment {
         LineData data = new LineData(xValues, dataSet);
         data.setDrawValues(false);
 
+
+        // styling
         lineChart.setData(data);
         lineChart.setDescription("Quantidade de questões feitas por mês.");
         lineChart.animateY(1000);
@@ -112,6 +116,8 @@ public class Graphics extends Fragment {
         lineChart.setData(data);
     }
 
+
+    //atualizar o grafico
     @OnClick(R.id.refreshButton) void refresh() {
         //Log.d("CodingHub","aqqq");
         lineChart.notifyDataSetChanged();

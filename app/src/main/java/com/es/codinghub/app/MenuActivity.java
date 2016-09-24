@@ -1,5 +1,8 @@
 package com.es.codinghub.app;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -54,7 +57,24 @@ public class MenuActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        if (id == R.id.action_logout) {
+            SharedPreferences authPref = getSharedPreferences(
+                    getString(R.string.authentication_file), Context.MODE_PRIVATE);
+
+            SharedPreferences.Editor editor = authPref.edit();
+            editor.putLong("userid", -1);
+            editor.commit();
+
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+
+            return true;
+        }
+
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 

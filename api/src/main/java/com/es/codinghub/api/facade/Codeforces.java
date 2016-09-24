@@ -76,7 +76,7 @@ public class Codeforces implements OnlineJudgeApi {
 			JSONObject c = contests.getJSONObject(i);
 			Contest contest = createContest(c);
 
-			if (contest.getTimestamp() > timestamp)
+			if (contest.getTimestamp() + contest.getDuration() > timestamp)
 				result.add(contest);
 		}
 

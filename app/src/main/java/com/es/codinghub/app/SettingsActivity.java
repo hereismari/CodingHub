@@ -73,13 +73,6 @@ public class SettingsActivity extends Activity {
 		progressDialog.dismiss();
 	}
 
-	@Override
-	public void onBackPressed() {
-		Intent intent = new Intent(this, LoginActivity.class);
-		startActivity(intent);
-		finish();
-	}
-
 	@OnClick(R.id.changePasswordButton) void trocarSenha() {
 
 		hideKeyboard();

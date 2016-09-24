@@ -56,6 +56,12 @@ public class LoginActivity extends Activity {
 
         queue = Volley.newRequestQueue(this);
         baseUrl = getString(R.string.api_url);
+
+        SharedPreferences authPref = getSharedPreferences(
+                getString(R.string.authentication_file), Context.MODE_PRIVATE);
+
+        long userid = authPref.getLong("userid", -1);
+        if (userid != -1) onSuccess(userid);
     }
 
     @Override
