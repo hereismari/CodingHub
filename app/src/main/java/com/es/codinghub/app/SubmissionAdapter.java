@@ -27,16 +27,16 @@ public class SubmissionAdapter extends ArrayAdapter<SubmissionView> {
 
         convertView = LayoutInflater.from(this.mContext).inflate(R.layout.submission, null);
 
-        ImageView judgeImage = (ImageView) convertView.findViewById(R.id.imageView3);
+        ImageView judgeImage = (ImageView) convertView.findViewById(R.id.judgeImage);
         judgeImage.setImageResource(subPosition.getJudgeImage());
 
-        ImageView verdictImage = (ImageView) convertView.findViewById(R.id.imageView2);
+        ImageView verdictImage = (ImageView) convertView.findViewById(R.id.verdictImage);
         verdictImage.setImageResource(subPosition.getVerdictImage());
 
-        TextView problemName = (TextView) convertView.findViewById(R.id.textView2);
+        TextView problemName = (TextView) convertView.findViewById(R.id.problemName);
         problemName.setText(subPosition.getProblemName());
 
-        TextView languageName = (TextView) convertView.findViewById(R.id.textView3);
+        TextView languageName = (TextView) convertView.findViewById(R.id.langName);
         languageName.setText(subPosition.getLanguageName());
 
         return convertView;

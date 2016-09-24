@@ -28,25 +28,19 @@ public class ContestAdapter extends ArrayAdapter<ContestView> {
 
         convertView = LayoutInflater.from(this.mContext).inflate(R.layout.contest, null);
 
-        ImageView judgeImage = (ImageView) convertView.findViewById(R.id.imageView4);
+        ImageView judgeImage = (ImageView) convertView.findViewById(R.id.judgeImage);
         judgeImage.setImageResource(contPosition.getJudgeImage());
 
-        TextView contestName = (TextView) convertView.findViewById(R.id.textView4);
+        TextView contestName = (TextView) convertView.findViewById(R.id.contestName);
         contestName.setText(contPosition.getContestName());
 
-        TextView judgeName = (TextView) convertView.findViewById(R.id.textView5);
+        TextView judgeName = (TextView) convertView.findViewById(R.id.judgeName);
         judgeName.setText(contPosition.getJudgeName());
 
-        TextView startTime = (TextView) convertView.findViewById(R.id.textView6);
+        TextView startTime = (TextView) convertView.findViewById(R.id.startTime);
         startTime.setText(contPosition.getTimeToStart());
         if (contPosition.getTimeToStart().equals("Live"))
             startTime.setTextColor(mContext.getResources().getColor(R.color.mat_light_green));
-
-        Button registerB = (Button) convertView.findViewById(R.id.button);
-        registerB.setText("Register");
-
-        Button shareB = (Button) convertView.findViewById(R.id.button2);
-        shareB.setText("Share");
 
         return convertView;
     }
