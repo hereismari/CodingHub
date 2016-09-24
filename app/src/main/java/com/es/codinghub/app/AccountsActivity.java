@@ -103,22 +103,22 @@ public class AccountsActivity extends Activity {
 
         queue.add(new StringRequest(Request.Method.POST, url,
 
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        onlineJudgeUser.setText(null);
-                        loadData();
-                    }
-                },
+            new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    onlineJudgeUser.setText(null);
+                    loadData();
+                }
+            },
 
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getBaseContext(), getString(R.string.operation_failed),
-                                Toast.LENGTH_LONG).show();
-                        progressDialog.hide();
-                    }
-                })
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getBaseContext(), getString(R.string.operation_failed),
+                            Toast.LENGTH_LONG).show();
+                    progressDialog.hide();
+                }
+            })
         {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
@@ -149,32 +149,32 @@ public class AccountsActivity extends Activity {
 
         queue.add(new JsonObjectRequest(Request.Method.GET, url,
 
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray array = response.getJSONArray("accounts");
-                            List<JSONObject> values = new ArrayList<>();
+            new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        JSONArray array = response.getJSONArray("accounts");
+                        List<JSONObject> values = new ArrayList<>();
 
-                            for (int i=0; i<array.length(); ++i)
-                                values.add(array.getJSONObject(i));
+                        for (int i=0; i<array.length(); ++i)
+                            values.add(array.getJSONObject(i));
 
-                            adapter = new AccountsAdapter(AccountsActivity.this, values);
-                            accounts.setAdapter(adapter);
-                            progressDialog.hide();
-                        }
+                        adapter = new AccountsAdapter(AccountsActivity.this, values);
+                        accounts.setAdapter(adapter);
+                        progressDialog.hide();
+                    }
                         catch (JSONException e) {}
-                    }
-                },
+                }
+            },
 
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getBaseContext(), getString(R.string.no_connection),
-                                Toast.LENGTH_LONG).show();
-                        onBackPressed();
-                    }
-                })
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getBaseContext(), getString(R.string.no_connection),
+                            Toast.LENGTH_LONG).show();
+                    onBackPressed();
+                }
+            })
         );
     }
 
@@ -208,7 +208,7 @@ public class AccountsActivity extends Activity {
                 holder.judgeTextView.setText(judge);
                 holder.userTextView.setText(username);
             }
-            catch (JSONException e) {}
+                catch (JSONException e) {}
             return view;
         }
 
@@ -239,20 +239,20 @@ public class AccountsActivity extends Activity {
 
                     queue.add(new StringRequest(Request.Method.DELETE, url,
 
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    adapter.remove(account);
-                                    progressDialog.hide();
-                                }
-                            },
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                adapter.remove(account);
+                                progressDialog.hide();
+                            }
+                        },
 
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    onFail();
-                                }
-                            })
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                onFail();
+                            }
+                        })
                     );
                 }
 
