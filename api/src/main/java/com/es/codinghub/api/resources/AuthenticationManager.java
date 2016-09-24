@@ -1,9 +1,13 @@
 package com.es.codinghub.api.resources;
 
+import javax.mail.MessagingException;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -11,11 +15,19 @@ import javax.ws.rs.core.Response.Status;
 import org.json.JSONObject;
 
 import com.es.codinghub.api.Database;
+import com.es.codinghub.api.Mailing;
+import com.es.codinghub.api.entities.User;
 
-@Path("/login")
+import java.math.BigInteger;
+import java.security.SecureRandom;
+
+@Path("/auth")
 public class AuthenticationManager {
 
+	private static SecureRandom random = new SecureRandom();
+
 	@GET
+	@Path("/login")
 	public Response login(
 			@HeaderParam("email") String email,
 			@HeaderParam("password") String password) {
@@ -52,5 +64,50 @@ public class AuthenticationManager {
 		}
 
 		return Response.status(code).entity(body).build();
+	}
+
+	@POST
+	@Path("/recover")
+	@Consumes("application/x-www-form-urlencoded")
+	public Response recover(
+			@FormParam("email") String email) {
+
+		EntityManager manager = Database.createEntityManager();
+
+		String body = null;
+		Status code = null;
+
+		manager.getTransaction().begin();
+
+		try {
+			String query = "FROM User WHERE email=:email";
+
+			User user = manager.createQuery(query, User.class)
+					.setParameter("email", email)
+					.getSingleResult();
+
+			String password = generatePassword();
+			user.setPassword(password);
+
+			Mailing.sendParallel(email, "Recupera\u00e7\u00e3o de conta",
+					"Sua nova senha \u00e9: " + password).start();
+
+			code = Status.OK;
+		}
+
+		catch (NoResultException e) {
+			code = Status.BAD_REQUEST;
+		}
+
+		finally {
+			manager.getTransaction().commit();
+			manager.close();
+		}
+
+		return Response.status(code).entity(body).build();
+	}
+
+	private String generatePassword() {
+		return new BigInteger(60, random).toString(32);
 	}
 }
