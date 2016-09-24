@@ -22,11 +22,11 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
 
         if(position == 0) {
-            Tab1 tab1 = new Tab1();
+            ContestsList tab1 = new ContestsList();
             return tab1;
         }
         else if (position == 1) {
-            Tab2 tab2 = new Tab2();
+            SubmissionsList tab2 = new SubmissionsList();
             return tab2;
         }
         else {
