@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.json.JSONString;
 import org.json.JSONStringer;
@@ -27,6 +28,7 @@ public class Account implements JSONString {
 	private OnlineJudge judge;
 
 	@NotNull
+	@Size(min=1)
 	private String username;
 
 	public Account() {}
@@ -46,6 +48,23 @@ public class Account implements JSONString {
 
 	public String getUsername() {
 		return username;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Account == false)
+			return false;
+		Account other = (Account) obj;
+		return	judge.equals(other.judge) &&
+				username.equals(other.username);
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 0, prime = 31;
+		hash = hash * prime + judge.hashCode();
+		hash = hash * prime + username.hashCode();
+		return hash;
 	}
 
 	@Override

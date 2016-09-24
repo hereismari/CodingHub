@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+    <string-array name="online_judges">
+        <item>Codeforces</item>
+        <item>UVa</item>
+    </string-array>
+</resources>
