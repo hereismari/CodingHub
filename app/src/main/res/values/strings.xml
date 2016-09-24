@@ -11,6 +11,7 @@
     <string name="confirm_signup">Registrar</string>
     <string name="confirm_login">Entrar</string>
     <string name="password_again">Digite sua senha novamente</string>
+
     <string name="passwords_differ">As senhas não conferem</string>
     <string name="signing_up">Registrando&#8230;</string>
     <string name="signup_failed">Não foi possível concluir o cadastro</string>
