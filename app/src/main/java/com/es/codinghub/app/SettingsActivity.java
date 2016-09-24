@@ -6,17 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -28,13 +21,10 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -43,16 +33,14 @@ import butterknife.OnClick;
 
 public class SettingsActivity extends Activity {
 
-    @BindView(R.id.onlineJudgeSpinner) Spinner onlineJudge;
-    @BindView(R.id.userEditText) EditText onlineJudgeUser;
-    @BindView(R.id.accountsListView) ListView accounts;
-    @BindView(R.id.registerButton) Button register;
+    @BindView(R.id.oldPasswordEditText) EditText oldPassword;
+    @BindView(R.id.newPasswordEditText) EditText newPassword;
 
     private ProgressDialog progressDialog;
-    private AccountsAdapter adapter;
     private RequestQueue queue;
 
     private Long userid;
+    private String email;
     private String baseUrl;
 
     @Override
@@ -87,27 +75,74 @@ public class SettingsActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(this, SettingsMenuActivity.class);
+        Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();
     }
 
-    @OnClick(R.id.registerButton) void register() {
+    @OnClick(R.id.changePasswordButton) void trocarSenha() {
 
         hideKeyboard();
 
-        progressDialog.setMessage(getString(R.string.registering_account));
+        progressDialog.setMessage(getString(R.string.changing_password));
         progressDialog.show();
 
-        String url = baseUrl + "/user/" + userid + "/account";
+        String url = baseUrl + "/login";
 
-        queue.add(new StringRequest(Request.Method.POST, url,
+        queue.add(new JsonObjectRequest(Request.Method.GET, url,
+
+            new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    commit();
+                }
+            },
+
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getBaseContext(), getString(R.string.wrong_password),
+                            Toast.LENGTH_LONG).show();
+                    clearAll();
+                }
+            })
+        {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+
+                String password = oldPassword.getText().toString();
+
+                params.put("email", email);
+                params.put("password", password);
+
+                return params;
+            }
+        });
+    }
+
+    @OnClick(R.id.accountsButton) void editAccounts() {
+        Intent intent = new Intent(this, AccountsActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    public void clearAll() {
+        oldPassword.setText(null);
+        newPassword.setText(null);
+        progressDialog.hide();
+    }
+
+    public void commit() {
+        String url = baseUrl + "/user/" + userid + "/password";
+
+        queue.add(new StringRequest(Request.Method.PUT, url,
 
             new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    onlineJudgeUser.setText(null);
-                    loadData();
+                    clearAll();
                 }
             },
 
@@ -116,21 +151,18 @@ public class SettingsActivity extends Activity {
                 public void onErrorResponse(VolleyError error) {
                     Toast.makeText(getBaseContext(), getString(R.string.operation_failed),
                             Toast.LENGTH_LONG).show();
-                    progressDialog.hide();
+                    clearAll();
                 }
             })
         {
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
+            public String getBodyContentType() {
+                return "text/plain";
+            }
 
-                String judge = onlineJudge.getSelectedItem().toString();
-                String username = onlineJudgeUser.getText().toString();
-
-                params.put("judge", judge);
-                params.put("username", username);
-
-                return params;
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return newPassword.getText().toString().getBytes();
             }
         });
     }
@@ -144,7 +176,6 @@ public class SettingsActivity extends Activity {
     }
 
     public void loadData() {
-
         String url = baseUrl + "/user/" + userid;
 
         queue.add(new JsonObjectRequest(Request.Method.GET, url,
@@ -153,17 +184,8 @@ public class SettingsActivity extends Activity {
                 @Override
                 public void onResponse(JSONObject response) {
                     try {
-                        JSONArray array = response.getJSONArray("accounts");
-                        List<JSONObject> values = new ArrayList<>();
-
-                        for (int i=0; i<array.length(); ++i)
-                            values.add(array.getJSONObject(i));
-
-                        adapter = new AccountsAdapter(SettingsActivity.this, values);
-                        accounts.setAdapter(adapter);
-                        progressDialog.hide();
-                    }
-                        catch (JSONException e) {}
+                        email = response.getString("email");
+                    } catch (JSONException e) {}
                 }
             },
 
@@ -176,96 +198,5 @@ public class SettingsActivity extends Activity {
                 }
             })
         );
-    }
-
-    public class AccountsAdapter extends ArrayAdapter<JSONObject> {
-
-        public AccountsAdapter(Context context, List<JSONObject> accounts) {
-            super(context, 0, accounts);
-        }
-
-        @Override
-        public View getView(int position, View view, ViewGroup parent) {
-
-            JSONObject data = getItem(position);
-            Context context = getContext();
-
-            ViewHolder holder;
-
-            if (view != null)
-                holder = (ViewHolder) view.getTag();
-
-            else {
-                view = LayoutInflater.from(context).inflate(R.layout.account, parent, false);
-                holder = new ViewHolder(view, position);
-                view.setTag(holder);
-            }
-
-            try {
-                String judge = data.getString("judge");
-                String username = data.getString("username");
-
-                holder.judgeTextView.setText(judge);
-                holder.userTextView.setText(username);
-            }
-                catch (JSONException e) {}
-            return view;
-        }
-
-        public class ViewHolder {
-
-            @BindView(R.id.judgeTextView) TextView judgeTextView;
-            @BindView(R.id.userTextView) TextView userTextView;
-
-            public int position;
-
-            public ViewHolder(View view, int position) {
-                ButterKnife.bind(this, view);
-                this.position = position;
-            }
-
-            @OnClick(R.id.deleteButton) void delete() {
-
-                try {
-                    final JSONObject account = getItem(position);
-                    Long accountid = null;
-
-                    accountid = account.getLong("id");
-
-                    progressDialog.setMessage(getString(R.string.deleting_account));
-                    progressDialog.show();
-
-                    String url = baseUrl + "/user/" + userid + "/account/" + accountid;
-
-                    queue.add(new StringRequest(Request.Method.DELETE, url,
-
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                adapter.remove(account);
-                                progressDialog.hide();
-                            }
-                        },
-
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                onFail();
-                            }
-                        })
-                    );
-                }
-
-                catch (JSONException e) {
-                    onFail();
-                }
-            }
-
-            public void onFail() {
-                Toast.makeText(getBaseContext(), getString(R.string.operation_failed),
-                        Toast.LENGTH_LONG).show();
-                progressDialog.hide();
-            }
-        }
     }
 }
