@@ -7,6 +7,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -116,6 +117,80 @@ public class UserManager {
 
 		catch (RollbackException e) {
 			code = Status.INTERNAL_SERVER_ERROR;
+		}
+
+		finally {
+			manager.close();
+		}
+
+		return Response.status(code).entity(body).build();
+	}
+
+	@PUT
+	@Path("/{userid}/email")
+	@Consumes(MediaType.TEXT_PLAIN)
+	public Response updateEmail(String email,
+			@PathParam("userid") long userid) {
+
+		EntityManager manager = Database.createEntityManager();
+
+		String body = null;
+		Status code = null;
+
+		try {
+			manager.getTransaction().begin();
+			User user = manager.find(User.class, userid);
+
+			if (user == null)
+				code = Status.NOT_FOUND;
+
+			else {
+				user.setEmail(email);
+				code = Status.OK;
+			}
+
+			manager.getTransaction().commit();
+		}
+
+		catch (RollbackException e) {
+			code = Status.BAD_REQUEST;
+		}
+
+		finally {
+			manager.close();
+		}
+
+		return Response.status(code).entity(body).build();
+	}
+
+	@PUT
+	@Path("/{userid}/password")
+	@Consumes(MediaType.TEXT_PLAIN)
+	public Response updatePassword(String password,
+			@PathParam("userid") long userid) {
+
+		EntityManager manager = Database.createEntityManager();
+
+		String body = null;
+		Status code = null;
+
+		try {
+			manager.getTransaction().begin();
+			User user = manager.find(User.class, userid);
+
+			if (user == null)
+				code = Status.NOT_FOUND;
+
+			else {
+				user.setPassword(password);
+				code = Status.OK;
+			}
+
+			manager.getTransaction().commit();
+		}
+
+		catch (RollbackException e) {
+			code = Status.BAD_REQUEST;
 		}
 
 		finally {

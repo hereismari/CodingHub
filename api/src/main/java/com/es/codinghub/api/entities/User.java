@@ -76,6 +76,14 @@ public class User implements JSONString {
 		return accounts;
 	}
 
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof User == false)
