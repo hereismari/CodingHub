@@ -129,7 +129,7 @@ public class LoginActivity extends Activity {
         editor.putLong("userid", userid);
         editor.commit();
 
-        Intent intent = new Intent(this, AccountsActivity.class);
+        Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
         finish();
     }

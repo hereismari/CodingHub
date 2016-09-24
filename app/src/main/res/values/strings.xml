@@ -27,4 +27,10 @@
     <string name="recovering">Recuperando Senha&#8230;</string>
     <string name="recovery_failed">Recuperação falhou</string>
     <string name="recovery_succeded">Um e-mail foi enviado para você</string>
+    <string name="edit_accounts">Editar Online Judges</string>
+    <string name="change_password">Trocar Senha</string>
+    <string name="old_password">Senha antiga</string>
+    <string name="new_password">Nova senha</string>
+    <string name="changing_password">Trocando Senha&#8230;</string>
+    <string name="wrong_password">Senha incorreta</string>
 </resources>
