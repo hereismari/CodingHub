@@ -35,4 +35,7 @@
     <string name="new_password">Nova senha</string>
     <string name="changing_password">Trocando Senha&#8230;</string>
     <string name="wrong_password">Senha incorreta</string>
+    <string name="delete_user">Deletar Conta</string>
+    <string name="deleting_user">Deletando Conta&#8230;</string>
+    <string name="delete_instructions">Tem certeza que quer deletar sua conta? Você não poderá mais acessá-la caso faça isso.</string>
 </resources>

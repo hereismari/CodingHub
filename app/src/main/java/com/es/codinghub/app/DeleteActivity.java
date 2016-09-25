@@ -31,10 +31,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class SettingsActivity extends Activity {
+public class DeleteActivity extends Activity {
 
-	@BindView(R.id.oldPasswordEditText) EditText oldPassword;
-	@BindView(R.id.newPasswordEditText) EditText newPassword;
+	@BindView(R.id.passwordEditText) EditText passwordInput;
 
 	private ProgressDialog progressDialog;
 	private RequestQueue queue;
@@ -49,7 +48,7 @@ public class SettingsActivity extends Activity {
 
 		baseUrl = getString(R.string.api_url);
 
-		setContentView(R.layout.settings_activity);
+		setContentView(R.layout.delete_activity);
 		ButterKnife.bind(this);
 
 		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -73,41 +72,39 @@ public class SettingsActivity extends Activity {
 		progressDialog.dismiss();
 	}
 
-	@OnClick(R.id.changePasswordButton) void trocarSenha() {
+	@OnClick(R.id.confirmButton) void confirm() {
 
 		hideKeyboard();
-		if (validate() == false)
-			return;
 
-		progressDialog.setMessage(getString(R.string.changing_password));
+		progressDialog.setMessage(getString(R.string.deleting_user));
 		progressDialog.show();
 
 		String url = baseUrl + "/auth/login";
 
 		queue.add(new JsonObjectRequest(Request.Method.GET, url,
 
-				new Response.Listener<JSONObject>() {
-					@Override
-					public void onResponse(JSONObject response) {
-						commit();
-					}
-				},
+			new Response.Listener<JSONObject>() {
+				@Override
+				public void onResponse(JSONObject response) {
+					commit();
+				}
+			},
 
-				new Response.ErrorListener() {
-					@Override
-					public void onErrorResponse(VolleyError error) {
-						Toast.makeText(getBaseContext(), getString(R.string.wrong_password),
-								Toast.LENGTH_LONG).show();
-						clearAll();
-					}
-				})
+			new Response.ErrorListener() {
+				@Override
+				public void onErrorResponse(VolleyError error) {
+					Toast.makeText(getBaseContext(), getString(R.string.wrong_password),
+							Toast.LENGTH_LONG).show();
+					clearAll();
+				}
+			})
 		{
 
 			@Override
 			public Map<String, String> getHeaders() throws AuthFailureError {
 				Map<String, String> params = new HashMap<>();
 
-				String password = oldPassword.getText().toString();
+				String password = passwordInput.getText().toString();
 
 				params.put("email", email);
 				params.put("password", password);
@@ -117,54 +114,43 @@ public class SettingsActivity extends Activity {
 		});
 	}
 
-	@OnClick(R.id.accountsButton) void editAccounts() {
-		Intent intent = new Intent(this, AccountsActivity.class);
-		startActivity(intent);
-		finish();
-	}
-
-	@OnClick(R.id.deleteButton) void deleteUser() {
-		Intent intent = new Intent(this, DeleteActivity.class);
-		startActivity(intent);
-	}
-
 	public void clearAll() {
-		oldPassword.setText(null);
-		newPassword.setText(null);
+		passwordInput.setText(null);
 		progressDialog.hide();
 	}
 
 	public void commit() {
-		String url = baseUrl + "/user/" + userid + "/password";
+		String url = baseUrl + "/user/" + userid;
 
-		queue.add(new StringRequest(Request.Method.PUT, url,
+		queue.add(new StringRequest(Request.Method.DELETE, url,
 
-				new Response.Listener<String>() {
-					@Override
-					public void onResponse(String response) {
-						clearAll();
-					}
-				},
+			new Response.Listener<String>() {
+				@Override
+				public void onResponse(String response) {
+					clearAll();
 
-				new Response.ErrorListener() {
-					@Override
-					public void onErrorResponse(VolleyError error) {
-						Toast.makeText(getBaseContext(), getString(R.string.operation_failed),
-								Toast.LENGTH_LONG).show();
-						clearAll();
-					}
-				})
-		{
-			@Override
-			public String getBodyContentType() {
-				return "text/plain";
-			}
+					SharedPreferences authPref = getSharedPreferences(
+							getString(R.string.authentication_file), Context.MODE_PRIVATE);
 
-			@Override
-			public byte[] getBody() throws AuthFailureError {
-				return newPassword.getText().toString().getBytes();
-			}
-		});
+					SharedPreferences.Editor editor = authPref.edit();
+					editor.putLong("userid", -1);
+					editor.commit();
+
+					Intent intent = new Intent(DeleteActivity.this, LoginActivity.class);
+					startActivity(intent);
+					finish();
+				}
+			},
+
+			new Response.ErrorListener() {
+				@Override
+				public void onErrorResponse(VolleyError error) {
+					Toast.makeText(getBaseContext(), getString(R.string.operation_failed),
+							Toast.LENGTH_LONG).show();
+					clearAll();
+				}
+			})
+		);
 	}
 
 	public void hideKeyboard() {
@@ -180,39 +166,23 @@ public class SettingsActivity extends Activity {
 
 		queue.add(new JsonObjectRequest(Request.Method.GET, url,
 
-				new Response.Listener<JSONObject>() {
-					@Override
-					public void onResponse(JSONObject response) {
-						try {
-							email = response.getString("email");
-						} catch (JSONException e) {}
-					}
-				},
+			new Response.Listener<JSONObject>() {
+				@Override
+				public void onResponse(JSONObject response) {
+					try {
+						email = response.getString("email");
+					} catch (JSONException e) {}
+				}
+			},
 
-				new Response.ErrorListener() {
-					@Override
-					public void onErrorResponse(VolleyError error) {
-						Toast.makeText(getBaseContext(), getString(R.string.no_connection),
-								Toast.LENGTH_LONG).show();
-						onBackPressed();
-					}
-				})
+			new Response.ErrorListener() {
+				@Override
+				public void onErrorResponse(VolleyError error) {
+					Toast.makeText(getBaseContext(), getString(R.string.no_connection),
+							Toast.LENGTH_LONG).show();
+					onBackPressed();
+				}
+			})
 		);
-	}
-
-	public boolean validate() {
-		boolean valid = false;
-
-		String password = newPassword.getText().toString();
-
-		if (password.length() < 6)
-			newPassword.setError(getString(R.string.short_password));
-
-		else {
-			newPassword.setError(null);
-			valid = true;
-		}
-
-		return valid;
 	}
 }
