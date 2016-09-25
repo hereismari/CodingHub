@@ -36,11 +36,11 @@ public class Codeforces implements OnlineJudgeApi {
 	}
 
 	@Override
-	public List<Submission> getSubmissionsAfter(String username, Submission last) throws IOException {
-		String response = api.request("/user.status?handle=" + username);
-		int minTimestamp = last == null? -1 : last.getTimestamp();
-
+	public List<Submission> getSubmissionsAfter(String username, Submission last) {
 		try {
+			int minTimestamp = last == null? -1 : last.getTimestamp();
+			String response = api.request("/user.status?handle=" + username);
+
 			JSONArray subs = new JSONObject(response).getJSONArray("result");
 			List<Submission> result = new ArrayList<>();
 
@@ -54,7 +54,7 @@ public class Codeforces implements OnlineJudgeApi {
 			} return result;
 		}
 
-		catch (JSONException e) {
+		catch (IOException | JSONException e) {
 			return Collections.emptyList();
 		}
 	}

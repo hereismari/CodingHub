@@ -2,11 +2,13 @@ package com.es.codinghub.api.facade;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.es.codinghub.api.entities.Contest;
@@ -31,22 +33,28 @@ public class UVa implements OnlineJudgeApi {
 	}
 
 	@Override
-	public List<Submission> getSubmissionsAfter(String username, Submission last) throws IOException {
-		String userid = api.request("/uname2uid/" + username);
+	public List<Submission> getSubmissionsAfter(String username, Submission last) {
+		try {
+			String userid = api.request("/uname2uid/" + username);
 
-		String response = (last == null)?
-			api.request("/subs-user/" + userid):
-			api.request("/subs-user/" + userid + "/" + last.getId());
+			String response = (last == null) ?
+					api.request("/subs-user/" + userid) :
+					api.request("/subs-user/" + userid + "/" + last.getId());
 
-		JSONArray subs = new JSONObject(response).getJSONArray("subs");
-		List<Submission> result = new ArrayList<>();
+			JSONArray subs = new JSONObject(response).getJSONArray("subs");
+			List<Submission> result = new ArrayList<>();
 
-		for (int i = 0; i < subs.length(); ++i) {
-			JSONArray sub = subs.getJSONArray(i);
-			result.add(createSubmission(sub));
+			for (int i = 0; i < subs.length(); ++i) {
+				JSONArray sub = subs.getJSONArray(i);
+				result.add(createSubmission(sub));
+			}
+
+			return result;
 		}
 
-		return result;
+		catch (JSONException | IOException e) {
+			return Collections.emptyList();
+		}
 	}
 
 	@Override

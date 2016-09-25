@@ -11,6 +11,6 @@ import com.es.codinghub.api.entities.Submission;
 public interface OnlineJudgeApi {
 
 	List<Contest> getUpcomingContests() throws IOException;
-	List<Submission> getSubmissionsAfter(String username, Submission last) throws IOException;
+	List<Submission> getSubmissionsAfter(String username, Submission last);
 	JSONArray getSugestedProblems() throws IOException;
 }

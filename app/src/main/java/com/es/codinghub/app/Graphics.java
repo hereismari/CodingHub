@@ -1,12 +1,24 @@
 package com.es.codinghub.app;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -14,31 +26,53 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.utils.EntryXIndexComparator;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class Graphics extends Fragment {
 
+    @BindView(R.id.refreshButton) Button refreshButton;
+
     private LineChart lineChart;
+    private RequestQueue queue;
+    private String baseUrl;
+    private Long userid;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_home,container,false);
 
+        ButterKnife.bind(this, v);
+
         lineChart = (LineChart) v.findViewById(R.id.chart);
-        //multiLineChart();
-        simpleLineChart();
-        lineChart.setNoDataText("Ainda não temos dados ='(");
+        lineChart.setNoDataText("Carregando dados...");
+
+        SharedPreferences authPref = getActivity().getSharedPreferences(
+                getString(R.string.authentication_file), Context.MODE_PRIVATE);
+
+        userid = authPref.getLong("userid", -1);
+        queue = Volley.newRequestQueue(getActivity());
+        baseUrl = getString(R.string.api_url);
+
+        refresh();
 
         return v;
     }
 
-    private void simpleLineChart() {
+    private void simpleLineChart(int[] quantity_questions) {
 
-        // AQUI
-        int[] quantity_questions = {1,2,3,4,5,6,7,8,9,10,11,12};
         ArrayList<Entry> entries = new ArrayList<>();
         for (int i = 0; i < 12; i++)
             entries.add(new Entry(quantity_questions[i], i));
@@ -116,11 +150,71 @@ public class Graphics extends Fragment {
         lineChart.setData(data);
     }
 
-
-    //atualizar o grafico
     @OnClick(R.id.refreshButton) void refresh() {
-        //Log.d("CodingHub","aqqq");
-        lineChart.notifyDataSetChanged();
-        lineChart.invalidate();
+
+        refreshButton.setEnabled(false);
+
+        String url = baseUrl + "/user/" + userid + "/submissions";
+
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url,
+
+            new Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+                    try {
+                        int[] buckets = new int[12];
+                        Calendar today = GregorianCalendar.getInstance();
+
+                        for (int i=0; i<response.length(); ++i) {
+
+                            JSONObject submission = response.getJSONObject(i);
+
+                            Calendar cal = GregorianCalendar.getInstance();
+                            cal.setTimeInMillis(submission.getLong("timestamp") * 1000L);
+
+                            if (cal.get(Calendar.YEAR) == today.get(Calendar.YEAR))
+                                buckets[cal.get(Calendar.MONTH)] += 1;
+                        }
+
+                        simpleLineChart(buckets);
+
+                        refreshButton.setEnabled(true);
+                    }
+
+                    catch (JSONException e) {
+                        onFail();
+                    }
+                }
+            },
+
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    onFail();
+                }
+            }
+        );
+
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                120000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        queue.add(request);
+    }
+
+    public void onFail() {
+        Toast.makeText(getActivity().getBaseContext(), getString(R.string.no_connection),
+                Toast.LENGTH_LONG).show();
+
+        SharedPreferences authPref = getActivity().getSharedPreferences(
+                getString(R.string.authentication_file), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = authPref.edit();
+        editor.putLong("userid", -1);
+        editor.commit();
+
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        startActivity(intent);
+        getActivity().finish();
     }
 }

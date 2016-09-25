@@ -9,16 +9,18 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="24dp">
 
         <com.github.mikephil.charting.charts.LineChart
             android:layout_width="match_parent"
             android:layout_height="219dp"
-            android:id="@+id/chart"/>
+            android:id="@+id/chart"
+            android:layout_marginBottom="16dp"/>
 
         <Button
             android:id="@+id/refreshButton"
-            android:layout_width="100dp"
+            android:layout_width="match_parent"
             android:layout_height="50dp"
             android:text="Atualizar" />
     </LinearLayout>
