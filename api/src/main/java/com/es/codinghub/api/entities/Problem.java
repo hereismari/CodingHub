@@ -21,6 +21,10 @@ public class Problem implements JSONString {
 		this.solvedCount = solvedCount;
 	}
 
+	public Problem(String id, String name, OnlineJudge judge) {
+		this (id, name, judge, -1);
+	}
+
 	public String getId() {
 		return id;
 	}

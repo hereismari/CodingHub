@@ -157,6 +157,14 @@ public class Codeforces implements OnlineJudgeApi {
 		return prob.getInt("contestId") + prob.getString("index");
 	}
 
+	private Problem createProblem(JSONObject prob)  {
+		return new Problem(
+			buildProblemId(prob),
+			prob.getString("name"),
+			OnlineJudge.Codeforces
+		);
+	}
+
 	private Problem createProblem(JSONObject prob, JSONObject stats) {
 		return new Problem(
 			buildProblemId(prob),
@@ -170,10 +178,13 @@ public class Codeforces implements OnlineJudgeApi {
 		JSONObject prob = sub.getJSONObject("problem");
 		String id = buildProblemId(prob);
 
+		Problem problem = problems.containsKey(id)?
+				problems.get(id) : createProblem(prob);
+
 		return new Submission(
 			sub.getInt("id"),
 			sub.getInt("creationTimeSeconds"),
-			problems.get(id),
+			problem,
 			sub.getString("programmingLanguage"),
 			mapVerdict(sub.getString("verdict"))
 		);
