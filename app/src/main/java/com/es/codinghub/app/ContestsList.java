@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -43,53 +46,82 @@ public class ContestsList extends Fragment {
         queue = Volley.newRequestQueue(getActivity());
         baseUrl = getString(R.string.api_url);
 
-        String url = baseUrl + "/contests";
+        final String url = baseUrl + "/contests";
 
-        queue.add(new JsonArrayRequest(Request.Method.GET, url,
+        refreshList(v, url);
 
-            new Response.Listener<JSONArray>() {
-                @Override
-                public void onResponse(JSONArray response) {
-                    try {
-                        ArrayList<ContestView> list = new ArrayList<>();
-                        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm dd/MM");
+        final SwipeRefreshLayout swipeView = (SwipeRefreshLayout) v.findViewById(R.id.cont_swipe);
 
-                        for (int i=0; i<response.length(); ++i) {
-
-                            JSONObject contest = response.getJSONObject(i);
-                            Date date = new Date(contest.getLong("timestamp") * 1000L);
-
-                            int image = -1;
-                            if (contest.getString("judge").equals("Codeforces"))
-                                image = R.drawable.ic_codeforces;
-                            else if (contest.getString("judge").equals("UVa"))
-                                image = R.drawable.ic_uva;
-
-                            list.add(new ContestView(
-                                image,
-                                contest.getString("name"),
-                                formatter.format(date)
-                            ));
-                        }
-
-                        onSuccess(v, list);
-                    }
-
-                    catch (JSONException e) {
-                        onFail();
-                    }
-                }
-            },
-
-            new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    onFail();
-                }
-            })
+        swipeView.setColorSchemeColors(
+                getActivity().getResources().getColor(R.color.ColorPrimary),
+                getActivity().getResources().getColor(R.color.ColorPrimaryDark)
         );
 
+        swipeView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+
+            @Override
+            public void onRefresh() {
+                swipeView.setRefreshing(true);
+                (new Handler()).postDelayed(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        swipeView.setRefreshing(false);
+                        refreshList(v, url);
+                    }
+
+                }, 3000);
+            }
+
+        });
+
         return v;
+    }
+
+    public void refreshList(final View v, final String url) {
+        queue.add(new JsonArrayRequest(Request.Method.GET, url,
+
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            ArrayList<ContestView> list = new ArrayList<>();
+                            SimpleDateFormat formatter = new SimpleDateFormat("HH:mm dd/MM");
+
+                            for (int i=0; i<response.length(); ++i) {
+
+                                JSONObject contest = response.getJSONObject(i);
+                                Date date = new Date(contest.getLong("timestamp") * 1000L);
+
+                                int image = -1;
+                                if (contest.getString("judge").equals("Codeforces"))
+                                    image = R.drawable.ic_codeforces;
+                                else if (contest.getString("judge").equals("UVa"))
+                                    image = R.drawable.ic_uva;
+
+                                list.add(new ContestView(
+                                        image,
+                                        contest.getString("name"),
+                                        formatter.format(date)
+                                ));
+                            }
+
+                            onSuccess(v, list);
+                        }
+
+                        catch (JSONException e) {
+                            onFail();
+                        }
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        onFail();
+                    }
+                })
+        );
     }
 
     public void onSuccess(View v, ArrayList<ContestView> list) {

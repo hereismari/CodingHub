@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,62 +48,93 @@ public class SubmissionsList extends Fragment {
         queue = Volley.newRequestQueue(getActivity());
         baseUrl = getString(R.string.api_url);
 
-        String url = baseUrl + "/user/" + userid + "/submissions";
+        final String url = baseUrl + "/user/" + userid + "/submissions";
 
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url,
-            new Response.Listener<JSONArray>() {
-                @Override
-                public void onResponse(JSONArray response) {
+        refreshList(v, url);
 
-                    try {
-                        ArrayList<SubmissionView> list = new ArrayList<>();
-                        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm dd/MM");
+        final SwipeRefreshLayout swipeView = (SwipeRefreshLayout) v.findViewById(R.id.subs_swipe);
 
-                        for (int i=0; i<Math.min(response.length(), 10); ++i) {
-                            JSONObject submission = response.getJSONObject(i);
-                            JSONObject problem = submission.getJSONObject("problem");
+        swipeView.setColorSchemeColors(
+                getActivity().getResources().getColor(R.color.ColorPrimary),
+                getActivity().getResources().getColor(R.color.ColorPrimaryDark)
+        );
 
-                            Date date = new Date(submission.getLong("timestamp") * 1000L);
+        swipeView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 
-                            int image = -1;
-                            if (problem.getString("judge").equals("Codeforces"))
-                                image = R.drawable.ic_codeforces;
-                            else if (problem.getString("judge").equals("UVa"))
-                                image = R.drawable.ic_uva;
+            @Override
+            public void onRefresh() {
+                swipeView.setRefreshing(true);
+                (new Handler()).postDelayed(new Runnable() {
 
-                            int verdict;
-                            if (submission.getString("verdict").equals("ACCEPTED"))
-                                verdict = R.drawable.accepted;
-                            else if (submission.getString("verdict").equals("TIME_LIMIT"))
-                                verdict = R.drawable.time_limit_exceed;
-                            else
-                                verdict = R.drawable.wrong_answer;
-
-                            list.add(new SubmissionView(
-                                    image,
-                                    problem.getString("name"),
-                                    formatter.format(date),
-                                    submission.getString("language"),
-                                    verdict
-                            ));
-                        }
-
-                        onSuccess(v, list);
+                    @Override
+                    public void run() {
+                        swipeView.setRefreshing(false);
+                        refreshList(v, url);
                     }
 
-                    catch (JSONException e) {
-                        e.printStackTrace();
+                }, 3000);
+            }
+
+        });
+
+        return v;
+    }
+
+    public void refreshList(final View v, final String url) {
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+
+                        try {
+                            ArrayList<SubmissionView> list = new ArrayList<>();
+                            SimpleDateFormat formatter = new SimpleDateFormat("HH:mm dd/MM");
+
+                            for (int i=0; i<Math.min(response.length(), 10); ++i) {
+                                JSONObject submission = response.getJSONObject(i);
+                                JSONObject problem = submission.getJSONObject("problem");
+
+                                Date date = new Date(submission.getLong("timestamp") * 1000L);
+
+                                int image = -1;
+                                if (problem.getString("judge").equals("Codeforces"))
+                                    image = R.drawable.ic_codeforces;
+                                else if (problem.getString("judge").equals("UVa"))
+                                    image = R.drawable.ic_uva;
+
+                                int verdict;
+                                if (submission.getString("verdict").equals("ACCEPTED"))
+                                    verdict = R.drawable.accepted;
+                                else if (submission.getString("verdict").equals("TIME_LIMIT"))
+                                    verdict = R.drawable.time_limit_exceed;
+                                else
+                                    verdict = R.drawable.wrong_answer;
+
+                                list.add(new SubmissionView(
+                                        image,
+                                        problem.getString("name"),
+                                        formatter.format(date),
+                                        submission.getString("language"),
+                                        verdict
+                                ));
+                            }
+
+                            onSuccess(v, list);
+                        }
+
+                        catch (JSONException e) {
+                            e.printStackTrace();
+                            onFail();
+                        }
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
                         onFail();
                     }
                 }
-            },
-
-            new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    onFail();
-                }
-            }
         );
 
         request.setRetryPolicy(new DefaultRetryPolicy(
@@ -109,8 +142,6 @@ public class SubmissionsList extends Fragment {
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(request);
-
-        return v;
     }
 
     public void onSuccess(View v, ArrayList<SubmissionView> list) {
