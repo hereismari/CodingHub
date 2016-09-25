@@ -13,13 +13,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <EditText
+        <TextView
+            android:text="@string/delete_instructions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:ems="10"
-            android:hint="@string/old_password"
-            android:id="@+id/oldPasswordEditText"
             android:layout_marginBottom="8dp"/>
 
         <EditText
@@ -27,34 +24,15 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:ems="10"
-            android:id="@+id/newPasswordEditText"
-            android:hint="@string/new_password"
+            android:hint="@string/password"
+            android:id="@+id/passwordEditText"
             android:layout_marginBottom="8dp"/>
-
-        <Button
-            android:text="@string/change_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/changePasswordButton"
-            android:layout_marginBottom="8dp"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="?android:attr/listDivider"
-            android:layout_marginBottom="8dp"/>
-
-        <Button
-            android:text="@string/edit_accounts"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/accountsButton"/>
 
         <Button
             android:text="@string/delete_user"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/deleteButton"
+            android:id="@+id/confirmButton"
             />
 
     </LinearLayout>
