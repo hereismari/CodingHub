@@ -10,12 +10,14 @@ public class Submission implements JSONString {
 	private int timestamp;
 
 	private Problem problem;
+	private String language;
 	private Verdict verdict;
 
-	public Submission(int id, int timestamp, Problem problem, Verdict verdict) {
+	public Submission(int id, int timestamp, Problem problem, String language, Verdict verdict) {
 		this.id = id;
 		this.timestamp = timestamp;
 		this.problem = problem;
+		this.language = language;
 		this.verdict = verdict;
 	}
 
@@ -29,6 +31,10 @@ public class Submission implements JSONString {
 
 	public Problem getProblem() {
 		return problem;
+	}
+
+	public String getLanguage() {
+		return language;
 	}
 
 	public Verdict getVerdict() {
@@ -55,6 +61,7 @@ public class Submission implements JSONString {
 				.key("id").value(id)
 				.key("timestamp").value(timestamp)
 				.key("problem").value(problem)
+				.key("language").value(language)
 				.key("verdict").value(verdict)
 			.endObject();
 

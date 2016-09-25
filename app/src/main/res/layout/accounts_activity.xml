@@ -26,11 +26,12 @@
 
         <EditText
             android:id="@+id/userEditText"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
             android:ems="10"
-            android:hint="@string/username">
+            android:hint="@string/username"
+            android:layout_weight="1">
             <requestFocus />
         </EditText>
 

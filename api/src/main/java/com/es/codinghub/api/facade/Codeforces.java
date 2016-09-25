@@ -36,11 +36,11 @@ public class Codeforces implements OnlineJudgeApi {
 	}
 
 	@Override
-	public List<Submission> getSubmissionsAfter(String username, Submission last) throws IOException {
-		String response = api.request("/user.status?handle=" + username);
-		int minTimestamp = last == null? -1 : last.getTimestamp();
-
+	public List<Submission> getSubmissionsAfter(String username, Submission last) {
 		try {
+			int minTimestamp = last == null? -1 : last.getTimestamp();
+			String response = api.request("/user.status?handle=" + username);
+
 			JSONArray subs = new JSONObject(response).getJSONArray("result");
 			List<Submission> result = new ArrayList<>();
 
@@ -54,7 +54,7 @@ public class Codeforces implements OnlineJudgeApi {
 			} return result;
 		}
 
-		catch (JSONException e) {
+		catch (IOException | JSONException e) {
 			return Collections.emptyList();
 		}
 	}
@@ -76,7 +76,7 @@ public class Codeforces implements OnlineJudgeApi {
 			JSONObject c = contests.getJSONObject(i);
 			Contest contest = createContest(c);
 
-			if (contest.getTimestamp() > timestamp)
+			if (contest.getTimestamp() + contest.getDuration() > timestamp)
 				result.add(contest);
 		}
 
@@ -157,6 +157,14 @@ public class Codeforces implements OnlineJudgeApi {
 		return prob.getInt("contestId") + prob.getString("index");
 	}
 
+	private Problem createProblem(JSONObject prob)  {
+		return new Problem(
+			buildProblemId(prob),
+			prob.getString("name"),
+			OnlineJudge.Codeforces
+		);
+	}
+
 	private Problem createProblem(JSONObject prob, JSONObject stats) {
 		return new Problem(
 			buildProblemId(prob),
@@ -170,10 +178,14 @@ public class Codeforces implements OnlineJudgeApi {
 		JSONObject prob = sub.getJSONObject("problem");
 		String id = buildProblemId(prob);
 
+		Problem problem = problems.containsKey(id)?
+				problems.get(id) : createProblem(prob);
+
 		return new Submission(
 			sub.getInt("id"),
 			sub.getInt("creationTimeSeconds"),
-			problems.get(id),
+			problem,
+			sub.getString("programmingLanguage"),
 			mapVerdict(sub.getString("verdict"))
 		);
 	}

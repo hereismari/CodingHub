@@ -56,6 +56,12 @@ public class LoginActivity extends Activity {
 
         queue = Volley.newRequestQueue(this);
         baseUrl = getString(R.string.api_url);
+
+        SharedPreferences authPref = getSharedPreferences(
+                getString(R.string.authentication_file), Context.MODE_PRIVATE);
+
+        long userid = authPref.getLong("userid", -1);
+        if (userid != -1) onSuccess(userid);
     }
 
     @Override
@@ -77,34 +83,32 @@ public class LoginActivity extends Activity {
     }
 
     @OnClick(R.id.loginButton) void login() {
-
-        progressDialog.setMessage(getString(R.string.authenticating));
         progressDialog.show();
 
         String url = baseUrl + "/auth/login";
 
         queue.add(new JsonObjectRequest(Request.Method.GET, url,
 
-            new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        long userid = response.getLong("userid");
-                        onSuccess(userid);
-                    }
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            long userid = response.getLong("userid");
+                            onSuccess(userid);
+                        }
 
-                    catch (JSONException e) {
+                        catch (JSONException e) {
+                            onFail();
+                        }
+                    }
+                },
+
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
                         onFail();
                     }
-                }
-            },
-
-            new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    onFail();
-                }
-            })
+                })
         {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -129,7 +133,7 @@ public class LoginActivity extends Activity {
         editor.putLong("userid", userid);
         editor.commit();
 
-        Intent intent = new Intent(this, SettingsActivity.class);
+        Intent intent = new Intent(this, MenuActivity.class);
         startActivity(intent);
         finish();
     }

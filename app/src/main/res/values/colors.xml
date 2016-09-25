@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="mat_light_green">#50d050</color>
+    <color name="ColorPrimary">#0288d1</color>
+    <color name="ColorPrimaryDark">#0277bd</color>
+    <color name="tabsScrollColor">#ffffff</color>
+</resources>

@@ -22,6 +22,8 @@
     <string name="deleting_account">Deletando Conta</string>
     <string name="fetching_data">Atualizando</string>
     <string name="no_connection">Sem conexão</string>
+    <string name="action_logout">Sair</string>
+    <string name="action_settings">Configurações</string>
     <string name="forgot_password">Esqueci minha senha</string>
     <string name="confirm_recovery">Recuperar Senha</string>
     <string name="recovering">Recuperando Senha&#8230;</string>
@@ -33,4 +35,7 @@
     <string name="new_password">Nova senha</string>
     <string name="changing_password">Trocando Senha&#8230;</string>
     <string name="wrong_password">Senha incorreta</string>
+    <string name="delete_user">Deletar Conta</string>
+    <string name="deleting_user">Deletando Conta&#8230;</string>
+    <string name="delete_instructions">Tem certeza que quer deletar sua conta? Você não poderá mais acessá-la caso faça isso.</string>
 </resources>

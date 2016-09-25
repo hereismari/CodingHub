@@ -27,6 +27,10 @@ public class Contest implements JSONString {
         return timestamp;
     }
 
+    public long getDuration() {
+        return duration;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof Contest == false)

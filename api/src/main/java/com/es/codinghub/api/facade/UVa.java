@@ -2,11 +2,13 @@ package com.es.codinghub.api.facade;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.es.codinghub.api.entities.Contest;
@@ -31,22 +33,28 @@ public class UVa implements OnlineJudgeApi {
 	}
 
 	@Override
-	public List<Submission> getSubmissionsAfter(String username, Submission last) throws IOException {
-		String userid = api.request("/uname2uid/" + username);
+	public List<Submission> getSubmissionsAfter(String username, Submission last) {
+		try {
+			String userid = api.request("/uname2uid/" + username);
 
-		String response = (last == null)?
-			api.request("/subs-user/" + userid):
-			api.request("/subs-user/" + userid + "/" + last.getId());
+			String response = (last == null) ?
+					api.request("/subs-user/" + userid) :
+					api.request("/subs-user/" + userid + "/" + last.getId());
 
-		JSONArray subs = new JSONObject(response).getJSONArray("subs");
-		List<Submission> result = new ArrayList<>();
+			JSONArray subs = new JSONObject(response).getJSONArray("subs");
+			List<Submission> result = new ArrayList<>();
 
-		for (int i = 0; i < subs.length(); ++i) {
-			JSONArray sub = subs.getJSONArray(i);
-			result.add(createSubmission(sub));
+			for (int i = 0; i < subs.length(); ++i) {
+				JSONArray sub = subs.getJSONArray(i);
+				result.add(createSubmission(sub));
+			}
+
+			return result;
 		}
 
-		return result;
+		catch (JSONException | IOException e) {
+			return Collections.emptyList();
+		}
 	}
 
 	@Override
@@ -66,7 +74,7 @@ public class UVa implements OnlineJudgeApi {
 			JSONObject c = contests.getJSONObject(i);
 			Contest contest = createContest(c);
 
-			if (contest.getTimestamp() > timestamp)
+			if (contest.getTimestamp() + contest.getDuration() > timestamp)
 				result.add(contest);
 		}
 
@@ -145,6 +153,7 @@ public class UVa implements OnlineJudgeApi {
 			sub.getInt(0),
 			sub.getInt(4),
 			problemsByID.get(sub.getInt(1)),
+			mapLanguage(sub.getInt(5)),
 			mapVerdict(sub.getInt(2))
 		);
 	}
@@ -156,6 +165,17 @@ public class UVa implements OnlineJudgeApi {
 			c.getLong("starttime"),
 			c.getLong("endtime")-c.getLong("starttime")
 		);
+	}
+
+	private String mapLanguage(int lang) {
+		switch (lang) {
+			case 1: return "ANSI C";
+			case 2: return "Java";
+			case 3: return "C++";
+			case 4: return "Pascal";
+			case 5: return "C++11";
+			default: return "NA";
+		}
 	}
 
 	private Verdict mapVerdict(int ver) {
