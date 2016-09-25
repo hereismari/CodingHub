@@ -142,7 +142,7 @@ public class Graphics extends Fragment {
 
 
         barChart.setData(data);
-        barChart.setDescription("Frequências dos veredictos.");
+        barChart.setDescription("Frequências dos tipos de veredictos.");
 
 
         barChart.animateX(1500);
