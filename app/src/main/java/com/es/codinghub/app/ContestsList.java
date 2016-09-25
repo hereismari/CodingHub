@@ -1,6 +1,7 @@
 package com.es.codinghub.app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -101,6 +102,16 @@ public class ContestsList extends Fragment {
     public void onFail() {
         Toast.makeText(getActivity().getBaseContext(), getString(R.string.no_connection),
                 Toast.LENGTH_LONG).show();
-        getActivity().onBackPressed();
+
+        SharedPreferences authPref = getActivity().getSharedPreferences(
+                getString(R.string.authentication_file), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = authPref.edit();
+        editor.putLong("userid", -1);
+        editor.commit();
+
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        startActivity(intent);
+        getActivity().finish();
     }
 }
