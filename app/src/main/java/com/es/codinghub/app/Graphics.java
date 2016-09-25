@@ -3,6 +3,7 @@ package com.es.codinghub.app;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -38,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -52,7 +55,7 @@ public class Graphics extends Fragment {
     @BindView(R.id.refreshButton) Button refreshButton;
 
     private LineChart lineChart;
-    private BarChart barChart;
+    private HorizontalBarChart barChart;
     private RequestQueue queue;
     private String baseUrl;
     private Long userid;
@@ -64,7 +67,7 @@ public class Graphics extends Fragment {
         ButterKnife.bind(this, v);
 
         lineChart = (LineChart) v.findViewById(R.id.lineChart);
-        barChart = (BarChart) v.findViewById(R.id.barChart);
+        barChart = (HorizontalBarChart) v.findViewById(R.id.barChart);
 
         lineChart.setNoDataText("Carregando dados...");
         barChart.setNoDataText("Carregando dados...");
@@ -90,9 +93,9 @@ public class Graphics extends Fragment {
         Collections.sort(entries, new EntryXIndexComparator());
 
         LineDataSet dataSet = new LineDataSet(entries, "Número de questões");
-        dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 
-        String c = "#ed1f24";
+        dataSet.setColor(Color.parseColor("#79BCFF"));
+        dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 
         String[] months = {"Jan", "Fev", "Mar", "Abr", "Maio", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"};
         ArrayList<String> xValues = new ArrayList<>();
@@ -103,14 +106,15 @@ public class Graphics extends Fragment {
         data.setDrawValues(false);
 
 
-        // styling
         lineChart.setData(data);
         lineChart.setDescription("Quantidade de questões feitas por mês.");
+
         lineChart.animateY(1000);
         lineChart.setTouchEnabled(true);
         lineChart.setDragEnabled(false);
         lineChart.setDoubleTapToZoomEnabled(false);
         lineChart.getXAxis().setDrawGridLines(false);
+
 
         LineGraphToolTip toolTip = new LineGraphToolTip(getActivity(), R.layout.line_graph_tooltip);
         lineChart.setMarkerView(toolTip);
@@ -118,6 +122,7 @@ public class Graphics extends Fragment {
 
 
     private void SimpleBarChart(Map<String, Integer> verdicts) {
+
         ArrayList<BarEntry> entries = new ArrayList<>();
         int i = 0;
         for (String verdict : verdicts.keySet()) {
@@ -125,7 +130,8 @@ public class Graphics extends Fragment {
             i++;
         }
 
-        BarDataSet dataSet = new BarDataSet(entries, "veredictos das questões");
+        BarDataSet dataSet = new BarDataSet(entries, "veredicto das questões");
+        dataSet.setColor(Color.parseColor("#79BCFF"));
 
         ArrayList<String> labels = new ArrayList<>();
         for (String verdict : verdicts.keySet()) {
@@ -133,8 +139,15 @@ public class Graphics extends Fragment {
         }
 
         BarData data = new BarData(labels, dataSet);
+
+
         barChart.setData(data);
-        barChart.getXAxis().setLabelsToSkip(0);
+        barChart.setDescription("Frequências dos veredictos.");
+
+
+        barChart.animateX(1500);
+        barChart.setDoubleTapToZoomEnabled(false);
+        barChart.getXAxis().setDrawGridLines(false);
     }
 
     @OnClick(R.id.refreshButton) void refresh() {
@@ -152,10 +165,16 @@ public class Graphics extends Fragment {
                         int[] buckets = new int[12];
                         Calendar today = GregorianCalendar.getInstance();
 
-                        // temporary
+                        // VERY VERY temporary
                         Map<String, Integer> verdicts =  new HashMap<String, Integer>();
-                        String[] ver = {"ACCEPTED", "COMPILATION_ERROR", "MEMORY_LIMIT", "OTHER", "PRESENTATION_ERROR", "RUNTIME_ERROR", "TIME_LIMIT", "WRONG_ANSWER"};
+                        String[] ver = {"ACCEPTED", "COMPILATION ERROR", "MEMORY LIMIT", "OTHER", "PRESENTATION ERROR", "RUNTIME ERROR", "TIME LIMIT", "WRONG ANSWER"};
+                        for (String s : ver) {
+                            String temp = "";
+                            temp += s.substring(0, 1);
+                            temp += s.substring(1).toLowerCase();
 
+                            verdicts.put(temp, 0);
+                        }
 
                         for (int i=0; i<response.length(); ++i) {
 
@@ -168,13 +187,11 @@ public class Graphics extends Fragment {
                                 buckets[cal.get(Calendar.MONTH)] += 1;
 
                             // temporary
-
-                            for (String s : ver) verdicts.put(s, 0);
-
-                            for (String result : ver) {
-                                Integer value = verdicts.get(result);
-                                verdicts.put(result, value + 1);
-                            }
+                            String key = ((String) submission.get("verdict")).replace('_', ' ');
+                            String formattedString = "";
+                            formattedString += key.substring(0,1);
+                            formattedString += key.substring(1).toLowerCase();
+                            verdicts.put(formattedString, verdicts.get(formattedString) + 1);
                         }
 
                         simpleLineChart(buckets);
