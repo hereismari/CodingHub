@@ -19,8 +19,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -36,6 +40,8 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,6 +52,7 @@ public class Graphics extends Fragment {
     @BindView(R.id.refreshButton) Button refreshButton;
 
     private LineChart lineChart;
+    private BarChart barChart;
     private RequestQueue queue;
     private String baseUrl;
     private Long userid;
@@ -56,8 +63,11 @@ public class Graphics extends Fragment {
 
         ButterKnife.bind(this, v);
 
-        lineChart = (LineChart) v.findViewById(R.id.chart);
+        lineChart = (LineChart) v.findViewById(R.id.lineChart);
+        barChart = (BarChart) v.findViewById(R.id.barChart);
+
         lineChart.setNoDataText("Carregando dados...");
+        barChart.setNoDataText("Carregando dados...");
 
         SharedPreferences authPref = getActivity().getSharedPreferences(
                 getString(R.string.authentication_file), Context.MODE_PRIVATE);
@@ -84,7 +94,7 @@ public class Graphics extends Fragment {
 
         String c = "#ed1f24";
 
-        String[] months = {"J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"};
+        String[] months = {"Jan", "Fev", "Mar", "Abr", "Maio", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"};
         ArrayList<String> xValues = new ArrayList<>();
         for (int i = 0; i < 12; i++)
             xValues.add(months[i]);
@@ -106,48 +116,25 @@ public class Graphics extends Fragment {
         lineChart.setMarkerView(toolTip);
     }
 
-    private void multiLineChart() {
-        String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-        ArrayList<String> xValues = new ArrayList<>();
-        for (int i = 0; i < months.length; i++)
-            xValues.add(months[i]);
 
-        int[] quantity_questionsUVA = {1,2,3,4,5,6,7,8,9,10,11,12};
-        int[] quantity_questionsCodeForces = {3,2,3,4,10,6,7,21,9,10,1,5};
-
-        String[] judges = {"UVA", "CodeForces"};
-        ArrayList<LineDataSet> dataSets = new ArrayList<LineDataSet>();
-        for (int i = 0; i < judges.length; i++) {
-            ArrayList<Entry> yValues = new ArrayList<Entry>();
-
-            for (int j = 0; j < months.length; j++) {
-                if (judges[i].equals("UVA")) {
-                    yValues.add(new Entry(quantity_questionsUVA[j], j));
-                } else {
-                    yValues.add(new Entry(quantity_questionsCodeForces[j], j));
-                }
-            }
-
-
-            String judge = "";
-            String col = "#004bf6";
-            judge = judges[i];
-            if (judges[i].equals("UVA")) {
-                col = "#ed1f24";
-            } else {
-                col = "#ffba00";
-            }
-
-            LineDataSet set = new LineDataSet(yValues, judge);
-
-            dataSets.add(set);
+    private void SimpleBarChart(Map<String, Integer> verdicts) {
+        ArrayList<BarEntry> entries = new ArrayList<>();
+        int i = 0;
+        for (String verdict : verdicts.keySet()) {
+            entries.add(new BarEntry(verdicts.get(verdict), i));
+            i++;
         }
 
-        LineData data = new LineData(xValues);
-        data.setDrawValues(false);
-        data.setHighlightEnabled(false);
+        BarDataSet dataSet = new BarDataSet(entries, "veredictos das questões");
 
-        lineChart.setData(data);
+        ArrayList<String> labels = new ArrayList<>();
+        for (String verdict : verdicts.keySet()) {
+            labels.add(verdict);
+        }
+
+        BarData data = new BarData(labels, dataSet);
+        barChart.setData(data);
+        barChart.getXAxis().setLabelsToSkip(0);
     }
 
     @OnClick(R.id.refreshButton) void refresh() {
@@ -165,6 +152,11 @@ public class Graphics extends Fragment {
                         int[] buckets = new int[12];
                         Calendar today = GregorianCalendar.getInstance();
 
+                        // temporary
+                        Map<String, Integer> verdicts =  new HashMap<String, Integer>();
+                        String[] ver = {"ACCEPTED", "COMPILATION_ERROR", "MEMORY_LIMIT", "OTHER", "PRESENTATION_ERROR", "RUNTIME_ERROR", "TIME_LIMIT", "WRONG_ANSWER"};
+
+
                         for (int i=0; i<response.length(); ++i) {
 
                             JSONObject submission = response.getJSONObject(i);
@@ -174,9 +166,19 @@ public class Graphics extends Fragment {
 
                             if (cal.get(Calendar.YEAR) == today.get(Calendar.YEAR))
                                 buckets[cal.get(Calendar.MONTH)] += 1;
+
+                            // temporary
+
+                            for (String s : ver) verdicts.put(s, 0);
+
+                            for (String result : ver) {
+                                Integer value = verdicts.get(result);
+                                verdicts.put(result, value + 1);
+                            }
                         }
 
                         simpleLineChart(buckets);
+                        SimpleBarChart(verdicts);
 
                         refreshButton.setEnabled(true);
                     }

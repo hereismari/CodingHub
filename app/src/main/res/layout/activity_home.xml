@@ -15,7 +15,13 @@
         <com.github.mikephil.charting.charts.LineChart
             android:layout_width="match_parent"
             android:layout_height="219dp"
-            android:id="@+id/chart"
+            android:id="@+id/lineChart"
+            android:layout_marginBottom="16dp"/>
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:layout_width="match_parent"
+            android:layout_height="219dp"
+            android:id="@+id/barChart"
             android:layout_marginBottom="16dp"/>
 
         <Button
