@@ -24,91 +24,84 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class SubmissionsList extends Fragment {
 
-    ArrayList<SubmissionView> list;
     private RequestQueue queue;
     private String baseUrl;
     private Long userid;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.submissions_list,container,false);
+        final View v = inflater.inflate(R.layout.submissions_list,container,false);
 
         SharedPreferences authPref = getActivity().getSharedPreferences(
                 "com.es.codinghub.AUTHENTICATION", Context.MODE_PRIVATE);
-
 
         userid = authPref.getLong("userid", -1);
         queue = Volley.newRequestQueue(getActivity());
         baseUrl = getString(R.string.api_url);
 
-        list = new ArrayList<SubmissionView>();
-
-        refresh();
-
-        // PARTE QUE JÁ ESTAVA
-
-        SubmissionAdapter adapter = new SubmissionAdapter(getActivity(), list);
-
-        ListView listView = (ListView) v.findViewById(R.id.subs_list);
-
-        listView.setAdapter(adapter);
-
-        return v;
-    }
-
-    private void refresh() {
-        final String url = baseUrl + "/user/" + userid + "/submissions";
+        String url = baseUrl + "/user/" + userid + "/submissions";
 
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        System.out.println("aq");
+            new Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
 
+                    try {
+                        ArrayList<SubmissionView> list = new ArrayList<>();
+                        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm dd/MM");
 
-                        try {
+                        for (int i=0; i<Math.min(response.length(), 10); ++i) {
+                            JSONObject submission = response.getJSONObject(i);
+                            JSONObject problem = submission.getJSONObject("problem");
 
-                            for (int i=0; i<response.length(); ++i) {
-                                JSONObject submission = response.getJSONObject(i);
+                            Date date = new Date(submission.getLong("timestamp") * 1000L);
 
-                                JSONObject problem = submission.getJSONObject("problem");
+                            int image = -1;
+                            if (problem.getString("judge").equals("Codeforces"))
+                                image = R.drawable.ic_codeforces;
+                            else if (problem.getString("judge").equals("UVa"))
+                                image = R.drawable.ic_uva;
 
-                                int image = -1;
-                                if (problem.getString("judge").equals("CodeForces"))
-                                    image = R.drawable.ic_codeforces;
-                                else if (submission.getString("judge").equals("UVa"))
-                                    image = R.drawable.ic_uva;
+                            int verdict;
+                            if (submission.getString("verdict").equals("ACCEPTED"))
+                                verdict = R.drawable.accepted;
+                            else if (submission.getString("verdict").equals("TIME_LIMIT"))
+                                verdict = R.drawable.time_limit_exceed;
+                            else
+                                verdict = R.drawable.wrong_answer;
 
-                                int verdict;
-                                if (submission.getString("verdict").equals("ACCEPTED"))
-                                    verdict = R.drawable.accepted;
-                                else if ((submission.getString("verdict").equals("TIME_LIMIT")))
-                                    verdict = R.drawable.time_limit_exceed;
-                                else
-                                    verdict = R.drawable.wrong_answer;
-
-                                //list.add(new SubmissionView(image, problem.getString("name"), "seila mano", verdict));
-                                break;
-                            }
-
+                            list.add(new SubmissionView(
+                                    image,
+                                    problem.getString("name"),
+                                    formatter.format(date),
+                                    submission.getString("language"),
+                                    verdict
+                            ));
                         }
 
-                        catch (JSONException e) {
-                            onFail();
-                        }
+                        onSuccess(v, list);
                     }
-                },
 
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
+                    catch (JSONException e) {
+                        e.printStackTrace();
                         onFail();
                     }
                 }
+            },
+
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    onFail();
+                }
+            }
         );
 
         request.setRetryPolicy(new DefaultRetryPolicy(
@@ -116,6 +109,14 @@ public class SubmissionsList extends Fragment {
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         queue.add(request);
+
+        return v;
+    }
+
+    public void onSuccess(View v, ArrayList<SubmissionView> list) {
+        SubmissionAdapter adapter = new SubmissionAdapter(getActivity(), list);
+        ListView listView = (ListView) v.findViewById(R.id.subs_list);
+        listView.setAdapter(adapter);
     }
 
     public void onFail() {

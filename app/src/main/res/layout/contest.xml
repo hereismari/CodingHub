@@ -9,14 +9,11 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        app:srcCompat="@android:color/darker_gray"
         android:id="@+id/judgeImage"
-        android:minWidth="50dp"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
-        android:paddingBottom="8dp"
-        android:paddingTop="8dp"/>
+        />
 
     <LinearLayout
         android:orientation="vertical"
@@ -27,24 +24,16 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/startTime"
-            android:layout_gravity="end"
+            android:id="@+id/contestName"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
             />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/contestName"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            android:minWidth="100dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/judgeName"
-            android:minWidth="50dp"
-            android:layout_marginBottom="8dp"/>
+            android:id="@+id/startTime"
+            />
 
     </LinearLayout>
 

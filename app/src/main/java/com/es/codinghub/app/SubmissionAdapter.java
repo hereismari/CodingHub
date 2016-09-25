@@ -36,6 +36,9 @@ public class SubmissionAdapter extends ArrayAdapter<SubmissionView> {
         TextView problemName = (TextView) convertView.findViewById(R.id.problemName);
         problemName.setText(subPosition.getProblemName());
 
+        TextView timeSubmitted = (TextView) convertView.findViewById(R.id.timestamp);
+        timeSubmitted.setText(subPosition.getTimeSubmitted());
+
         TextView languageName = (TextView) convertView.findViewById(R.id.langName);
         languageName.setText(subPosition.getLanguageName());
 

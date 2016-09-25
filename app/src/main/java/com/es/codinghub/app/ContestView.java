@@ -4,13 +4,11 @@ public class ContestView {
 
     private int judgeImage;
     private String contestName;
-    private String judgeName;
     private String timeToStart;
 
-    public ContestView(int image, String contest, String judge, String start) {
+    public ContestView(int image, String contest, String start) {
         judgeImage = image;
         contestName = contest;
-        judgeName = judge;
         timeToStart = start;
     }
 
@@ -28,14 +26,6 @@ public class ContestView {
 
     public String getContestName() {
         return contestName;
-    }
-
-    public String getJudgeName() {
-        return judgeName;
-    }
-
-    public void setJudgeName(String judgeName) {
-        this.judgeName = judgeName;
     }
 
     public void setContestName(String contestName) {

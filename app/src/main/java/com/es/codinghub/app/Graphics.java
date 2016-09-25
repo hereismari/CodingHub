@@ -79,7 +79,7 @@ public class Graphics extends Fragment {
         queue = Volley.newRequestQueue(getActivity());
         baseUrl = getString(R.string.api_url);
 
-        //refresh();
+        refresh();
 
         return v;
     }

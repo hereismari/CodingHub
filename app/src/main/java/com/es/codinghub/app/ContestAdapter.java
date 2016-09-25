@@ -34,9 +34,6 @@ public class ContestAdapter extends ArrayAdapter<ContestView> {
         TextView contestName = (TextView) convertView.findViewById(R.id.contestName);
         contestName.setText(contPosition.getContestName());
 
-        TextView judgeName = (TextView) convertView.findViewById(R.id.judgeName);
-        judgeName.setText(contPosition.getJudgeName());
-
         TextView startTime = (TextView) convertView.findViewById(R.id.startTime);
         startTime.setText(contPosition.getTimeToStart());
         if (contPosition.getTimeToStart().equals("Live"))

@@ -4,11 +4,13 @@ public class SubmissionView {
 
     private int judgeImage;
     private String problemName;
+    private String timeSubmitted;
     private String languageName;
     private int verdictImage;
 
-    public SubmissionView(int judge, String problem, String language, int verdict) {
+    public SubmissionView(int judge, String problem, String time, String language, int verdict) {
         problemName = problem;
+        timeSubmitted = time;
         languageName = language;
         judgeImage = judge;
         verdictImage = verdict;
@@ -36,6 +38,14 @@ public class SubmissionView {
 
     public void setProblemName(String problemName) {
         this.problemName = problemName;
+    }
+
+    public String getTimeSubmitted() {
+        return timeSubmitted;
+    }
+
+    public void setTimeSubmitted(String timeSubmitted) {
+        this.timeSubmitted = timeSubmitted;
     }
 
     public int getJudgeImage() {

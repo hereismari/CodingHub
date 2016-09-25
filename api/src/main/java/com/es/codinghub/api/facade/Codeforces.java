@@ -174,6 +174,7 @@ public class Codeforces implements OnlineJudgeApi {
 			sub.getInt("id"),
 			sub.getInt("creationTimeSeconds"),
 			problems.get(id),
+			sub.getString("programmingLanguage"),
 			mapVerdict(sub.getString("verdict"))
 		);
 	}

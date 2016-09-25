@@ -47,47 +47,46 @@ public class ContestsList extends Fragment {
 
         queue.add(new JsonArrayRequest(Request.Method.GET, url,
 
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        try {
-                            ArrayList<ContestView> list = new ArrayList<>();
-                            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM HH:mm");
+            new Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+                    try {
+                        ArrayList<ContestView> list = new ArrayList<>();
+                        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm dd/MM");
 
-                            for (int i=0; i<response.length(); ++i) {
+                        for (int i=0; i<response.length(); ++i) {
 
-                                JSONObject contest = response.getJSONObject(i);
-                                Date date = new Date(contest.getLong("timestamp") * 1000L);
+                            JSONObject contest = response.getJSONObject(i);
+                            Date date = new Date(contest.getLong("timestamp") * 1000L);
 
-                                int image = -1;
-                                if (contest.getString("judge").equals("Codeforces"))
-                                    image = R.drawable.ic_codeforces;
-                                else if (contest.getString("judge").equals("UVa"))
-                                    image = R.drawable.ic_uva;
+                            int image = -1;
+                            if (contest.getString("judge").equals("Codeforces"))
+                                image = R.drawable.ic_codeforces;
+                            else if (contest.getString("judge").equals("UVa"))
+                                image = R.drawable.ic_uva;
 
-                                list.add(new ContestView(
-                                    image,
-                                    contest.getString("name"),
-                                    contest.getString("judge"),
-                                    formatter.format(date)
-                                ));
-                            }
-
-                            onSuccess(v, list);
+                            list.add(new ContestView(
+                                image,
+                                contest.getString("name"),
+                                formatter.format(date)
+                            ));
                         }
 
-                        catch (JSONException e) {
-                            onFail();
-                        }
+                        onSuccess(v, list);
                     }
-                },
 
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
+                    catch (JSONException e) {
                         onFail();
                     }
-                })
+                }
+            },
+
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    onFail();
+                }
+            })
         );
 
         return v;

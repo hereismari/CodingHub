@@ -153,6 +153,7 @@ public class UVa implements OnlineJudgeApi {
 			sub.getInt(0),
 			sub.getInt(4),
 			problemsByID.get(sub.getInt(1)),
+			mapLanguage(sub.getInt(5)),
 			mapVerdict(sub.getInt(2))
 		);
 	}
@@ -164,6 +165,17 @@ public class UVa implements OnlineJudgeApi {
 			c.getLong("starttime"),
 			c.getLong("endtime")-c.getLong("starttime")
 		);
+	}
+
+	private String mapLanguage(int lang) {
+		switch (lang) {
+			case 1: return "ANSI C";
+			case 2: return "Java";
+			case 3: return "C++";
+			case 4: return "Pascal";
+			case 5: return "C++11";
+			default: return "NA";
+		}
 	}
 
 	private Verdict mapVerdict(int ver) {
