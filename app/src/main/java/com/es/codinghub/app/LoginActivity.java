@@ -83,6 +83,8 @@ public class LoginActivity extends Activity {
     }
 
     @OnClick(R.id.loginButton) void login() {
+
+        progressDialog.setMessage(getString(R.string.authenticating));
         progressDialog.show();
 
         String url = baseUrl + "/auth/login";
