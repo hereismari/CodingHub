@@ -5,12 +5,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -20,7 +21,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
-import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.YAxis;
@@ -36,23 +36,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class Graphics extends Fragment {
-
-    @BindView(R.id.refreshButton) Button refreshButton;
 
     private LineChart lineChart;
     private HorizontalBarChart barChart;
@@ -81,6 +74,31 @@ public class Graphics extends Fragment {
 
         refresh();
 
+        final SwipeRefreshLayout swipeView = (SwipeRefreshLayout) v.findViewById(R.id.subs_swipe);
+
+        swipeView.setColorSchemeColors(
+                getActivity().getResources().getColor(R.color.ColorPrimary),
+                getActivity().getResources().getColor(R.color.ColorPrimaryDark)
+        );
+
+        swipeView.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+
+            @Override
+            public void onRefresh() {
+                swipeView.setRefreshing(true);
+                (new Handler()).postDelayed(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        swipeView.setRefreshing(false);
+                        refresh();
+                    }
+
+                }, 3000);
+            }
+
+        });
+
         return v;
     }
 
@@ -107,7 +125,7 @@ public class Graphics extends Fragment {
 
 
         lineChart.setData(data);
-        lineChart.setDescription("Quantidade de questões feitas por mês.");
+        lineChart.setDescription("Quantidade de submissões feitas por mês.");
 
         lineChart.animateY(1000);
         lineChart.setTouchEnabled(true);
@@ -150,9 +168,7 @@ public class Graphics extends Fragment {
         barChart.getXAxis().setDrawGridLines(false);
     }
 
-    @OnClick(R.id.refreshButton) void refresh() {
-
-        refreshButton.setEnabled(false);
+    private void refresh() {
 
         String url = baseUrl + "/user/" + userid + "/submissions";
 
@@ -197,7 +213,6 @@ public class Graphics extends Fragment {
                         simpleLineChart(buckets);
                         SimpleBarChart(verdicts);
 
-                        refreshButton.setEnabled(true);
                     }
 
                     catch (JSONException e) {
