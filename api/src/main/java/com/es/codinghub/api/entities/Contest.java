@@ -23,6 +23,14 @@ public class Contest implements JSONString {
         this.duration = duration;
     }
 
+    public OnlineJudge getJudge() {
+        return judge;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     public long getTimestamp() {
         return timestamp;
     }

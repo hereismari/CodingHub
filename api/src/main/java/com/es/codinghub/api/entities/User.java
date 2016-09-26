@@ -72,12 +72,20 @@ public class User implements JSONString {
 		return id;
 	}
 
-	public List<Account> getAccounts() {
-		return accounts;
+	public String getEmail() {
+		return email;
+	}
+
+	public String getPassword() {
+		return password;
 	}
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public List<Account> getAccounts() {
+		return accounts;
 	}
 
 	@Override

@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class MyResourceTest {
+public class ExempleResourceTest {
 
     private HttpServer server;
     private WebTarget target;
